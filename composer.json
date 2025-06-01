@@ -1,0 +1,33 @@
+{
+    "name": "jpeters8889/phpunit-code-assertions",
+    "type": "library",
+    "require": {
+        "php": "^8.3",
+        "phpunit/phpunit": "^12.1",
+        "illuminate/collections": "^12.16",
+        "symfony/finder": "^7.3",
+        "illuminate/support": "^12.16"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.22",
+        "phpstan/phpstan": "^2.1",
+        "symfony/var-dumper": "^7.3",
+        "mockery/mockery": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jpeters8889\\PhpUnitCodeAssertions\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jpeters8889\\PhpUnitCodeAssertions\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jamie Peters",
+            "email": "jamie@jamie-peters.co.uk"
+        }
+    ]
+}
