@@ -2,20 +2,25 @@
 
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Assertions;
 
+use Composer\Autoload\ClassLoader;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\DoesNotUseFunctions;
+use Jpeters8889\PhpUnitCodeAssertions\Concerns\GetsAbsolutePath;
+use Jpeters8889\PhpUnitCodeAssertions\Concerns\RetrievesFiles;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class DoesNotUseFunctionsTest extends TestCase
 {
+    use RetrievesFiles;
+
     #[Test]
     public function itCanDetectWhenAFileContainsAForbiddenFunction(): void
     {
-        $assertion = new DoesNotUseFunctions('./../../Fixtures', ['ucwords']);
+        $assertion = new DoesNotUseFunctions($this->getAbsolutePath('tests/Fixtures'), 'tests/Fixtures', ['ucwords']);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Failed asserting that path does not use functions\n./../../Fixtures/MyClass.php uses function ucwords()");
+        $this->expectExceptionMessage("Failed asserting that path does not use functions\ntests/Fixtures/MyClass.php uses function ucwords()");
 
         $assertion->assert();
     }
@@ -23,10 +28,10 @@ class DoesNotUseFunctionsTest extends TestCase
     #[Test]
     public function itCanDetectWhenAFileContainsMultipleForbiddenFunction(): void
     {
-        $assertion = new DoesNotUseFunctions('./../../Fixtures', ['ucwords', 'lcfirst']);
+        $assertion = new DoesNotUseFunctions($this->getAbsolutePath('tests/Fixtures'), 'tests/Fixtures', ['ucwords', 'lcfirst']);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Failed asserting that path does not use functions\n./../../Fixtures/MyClass.php uses function ucwords()\n./../../Fixtures/MyClass.php uses function lcfirst()");
+        $this->expectExceptionMessage("Failed asserting that path does not use functions\ntests/Fixtures/MyClass.php uses function ucwords()\ntests/Fixtures/MyClass.php uses function lcfirst()");
 
         $assertion->assert();
     }
@@ -34,7 +39,7 @@ class DoesNotUseFunctionsTest extends TestCase
     #[Test]
     public function itDoesntErrorIfAClassDoesNotUseAnForbiddenFunction(): void
     {
-        $assertion = new DoesNotUseFunctions('./../../Fixtures', ['assert']);
+        $assertion = new DoesNotUseFunctions($this->getAbsolutePath('tests/Fixtures'), 'tests/Fixtures', ['assert']);
 
         $assertion->assert();
 

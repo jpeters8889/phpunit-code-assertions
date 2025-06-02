@@ -1,0 +1,115 @@
+<?php
+
+namespace Jpeters8889\PhpUnitCodeAssertions\Builders;
+
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Jpeters8889\PhpUnitCodeAssertions\Concerns\GetsAbsolutePath;
+use Jpeters8889\PhpUnitCodeAssertions\Concerns\RetrievesFiles;
+use Jpeters8889\PhpUnitCodeAssertions\Contracts\Assertable;
+use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingAssertion;
+use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
+use Jpeters8889\PhpUnitCodeAssertions\Factories\AssertableFactory;
+use Symfony\Component\Finder\SplFileInfo;
+
+abstract class Builder
+{
+    use GetsAbsolutePath;
+    use RetrievesFiles;
+
+    /** @var Collection<int, PendingAssertion> */
+    protected Collection $assertionsToMake;
+
+    protected bool $hasExecutedAssertions = false;
+
+    protected string $absolutePath;
+
+    protected string $localPath;
+
+    public function __construct(string $pathOrNamespace)
+    {
+        $this->normalisePath($pathOrNamespace);
+
+        $this->assertionsToMake = collect();
+    }
+
+    protected function normalisePath($pathOrNamespace): void
+    {
+        if (str_contains($pathOrNamespace, '\\')) {
+            $this->resolvePathsFromNamespace($pathOrNamespace);
+
+            return;
+        }
+
+        $this->localPath = $pathOrNamespace;
+        $this->absolutePath = $this->getAbsolutePath($this->localPath);
+    }
+
+
+
+    protected function resolvePathsFromNamespace($pathOrNamespace): void
+    {
+        $basePath = $this->getAbsolutePath('');
+        $rootNamespace = Str::of($pathOrNamespace)->before('\\')->append('\\');
+
+        $path = collect(include $basePath . 'vendor/composer/autoload_psr4.php')
+            ->filter(function ($path, $namespace) use ($rootNamespace) {
+                return Str::startsWith($namespace, $rootNamespace);
+            })
+            ->first();
+
+        $pathOrNamespace = Str::of($path[0])
+            ->append('/')
+            ->append(Str::of($pathOrNamespace)->after($rootNamespace)->replace('\\', '/'))
+            ->toString();
+
+        $this->absolutePath = $pathOrNamespace;
+        $this->localPath = Str::of($pathOrNamespace)->after($basePath);
+    }
+
+    /** @return Collection<int, PendingFile> */
+    protected function collectFilesToAssertAgainst(): Collection
+    {
+        return collect($this->getFiles($this->absolutePath)->name('*.php')->getIterator())
+            ->map(fn(SplFileInfo $file) => new PendingFile(
+                fileName: $file->getFilename(),
+                localPath: Str::of($file->getPathname())->after($this->absolutePath)->ltrim('/'),
+                absolutePath: $file->getPathname(),
+                contents: $file->getContents(),
+                fqns: null,
+            ));
+    }
+
+    /** @param class-string<Assertable> $assertion */
+    public function addAssertion(string $assertion, array $args = []): self
+    {
+        $this->assertionsToMake->push(new PendingAssertion($assertion, $args));
+
+        return $this;
+    }
+
+    public function getAssertionsToMake(): Collection
+    {
+        return $this->assertionsToMake;
+    }
+
+    public function executeAssertions(): void
+    {
+        $files = $this->collectFilesToAssertAgainst();
+
+        $this->assertionsToMake
+            ->map(fn(PendingAssertion $pendingAssertion) => AssertableFactory::make($pendingAssertion->assertable, $pendingAssertion->args))
+            ->each(fn(Assertable $assertion) => $assertion->assert($files));
+
+        $this->hasExecutedAssertions = true;
+    }
+
+    public function __destruct()
+    {
+        if ($this->hasExecutedAssertions) {
+            return;
+        }
+
+        $this->executeAssertions();
+    }
+}

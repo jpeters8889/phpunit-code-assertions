@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Jpeters8889\PhpUnitCodeAssertions\Concerns\RetrievesFiles;
 use Jpeters8889\PhpUnitCodeAssertions\Contracts\Assertable;
 use Jpeters8889\PhpUnitCodeAssertions\Dto\FileUsesFunction;
+use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
 use PHPUnit\Framework\Assert;
 
 class DoesNotUseFunctions implements Assertable
@@ -14,27 +15,27 @@ class DoesNotUseFunctions implements Assertable
 
     protected Collection $failures;
 
-    public function __construct(protected string $path, protected array $methods)
+    public function __construct(protected array $methods)
     {
         $this->failures = collect();
     }
 
-    public function assert(): void
+    public function assert(Collection $files): void
     {
-        foreach($this->getFiles($this->path)->name('*.php') as $file) {
-            $this->scanFileForMethodUsage($file->getContents(), $file);
-        }
+        $files->each(function(PendingFile $file) {
+            $this->scanFileForMethodUsage($file);
+        });
 
         if ($this->failures->isNotEmpty()) {
             Assert::fail($this->failureMessage());
         }
     }
 
-    protected function scanFileForMethodUsage(string $content, mixed $file): void
+    protected function scanFileForMethodUsage(PendingFile $file): void
     {
         collect($this->methods)
-            ->filter(fn(string $method) => preg_grep("/\b{$method}\(/i", [$content]))
-            ->each(fn(string $method) => $this->failures->push(new FileUsesFunction($file->getPathname(), $method)));
+            ->filter(fn(string $method) => preg_grep("/\b{$method}\(/i", [$file->contents]))
+            ->each(fn(string $method) => $this->failures->push(new FileUsesFunction($file->localPath, $method)));
     }
 
     protected function failureMessage(): string
