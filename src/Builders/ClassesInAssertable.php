@@ -2,18 +2,31 @@
 
 namespace Jpeters8889\PhpUnitCodeAssertions\Builders;
 
-use Jpeters8889\PhpUnitCodeAssertions\Concerns\GetsPathFromNamespace;
+use PhpParser\Node\Expr\Error;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\NodeFinder;
+use PhpParser\ParserFactory;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\Finder\SplFileInfo;
 
 class ClassesInAssertable extends CodeAssertable
 {
-    use GetsPathFromNamespace;
-
-    public function __construct(string $pathOrNamespace)
+    public function isFileTestable(SplFileInfo $file): bool
     {
-        if(str_contains($pathOrNamespace, '\\')) {
-            $pathOrNamespace = $this->getPathFromNamespace($pathOrNamespace);
+        try {
+            $ast = (new ParserFactory())
+                ->createForNewestSupportedVersion()
+                ->parse($file->getContents());
+
+            $classes = (new NodeFinder())->findInstanceOf($ast, Class_::class);
+
+            if(count($classes) === 0) {
+                return false;
+            }
+        } catch (Error) {
+            Assert::fail("Unable to parse file: {$file->getPathname()}");
         }
 
-        parent::__construct($pathOrNamespace);
+        return true;
     }
 }

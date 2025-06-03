@@ -2,95 +2,28 @@
 
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Builders;
 
+use Jpeters8889\PhpUnitCodeAssertions\Builders\Builder;
+use Jpeters8889\PhpUnitCodeAssertions\Builders\CodeAssertable;
+use Jpeters8889\PhpUnitCodeAssertions\Tests\Helpers\AssertablesToTestDto;
 use Illuminate\Support\Collection;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\DoesNotUseFunctions;
-use Jpeters8889\PhpUnitCodeAssertions\Builders\CodeAssertable;
-use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingAssertion;
-use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
-use Jpeters8889\PhpUnitCodeAssertions\Factories\AssertableFactory;
-use Jpeters8889\PhpUnitCodeAssertions\Tests\TestCase;
-use Mockery;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 
-class CodeAssertableTest extends TestCase
+class CodeAssertableTest extends BuilderTestCase
 {
-    #[Test]
-    #[DataProvider('assertablesToQueue')]
-    public function itQueuesUpTheEachAssertable(string $method, array $args, string $assertableClass): void
+    protected function makeBuilder(string $pathOrNamespace): Builder
     {
-        $builder = new CodeAssertable('tests/Fixtures');
-
-        $builder->$method(...$args);
-
-        $assertions = $builder->getAssertionsToMake();
-
-        $this->assertCount(1, $assertions);
-        $this->assertInstanceOf(PendingAssertion::class, $assertions->first());
-        $this->assertEquals($assertableClass, $assertions->first()->assertable);
+        return new CodeAssertable($pathOrNamespace);
     }
 
-    #[Test]
-    #[DataProvider('assertablesToExecute')]
-    public function itExecutesEachAssertionInTheShutdown(string $assertableClass): void
+    public static function getAssertablesToQueue(): Collection
     {
-        $mock = Mockery::mock($assertableClass)
-            ->shouldReceive('assert')
-            ->withArgs(function($files) {
-                $this->assertInstanceOf(Collection::class, $files);
-                $this->assertInstanceOf(PendingFile::class, $files->first());
-
-                return true;
-            })
-            ->once();
-
-        AssertableFactory::register($assertableClass, $mock->getMock());
-
-        $builder = new CodeAssertable('tests/Fixtures');
-
-        $builder->addAssertion($assertableClass, [['foo']]);
-
-        unset($builder);
-    }
-
-    #[Test]
-    #[DataProvider('assertablesToExecute')]
-    public function itCanExecuteEachAssertionByManuallyTriggering(string $assertableClass): void
-    {
-        $mock = Mockery::mock($assertableClass)
-            ->shouldReceive('assert')
-            ->withArgs(function($files) {
-                $this->assertInstanceOf(Collection::class, $files);
-                $this->assertInstanceOf(PendingFile::class, $files->first());
-
-                return true;
-            })
-            ->once();
-
-        AssertableFactory::register($assertableClass, $mock->getMock());
-
-        $builder = new CodeAssertable('tests/Fixtures');
-
-        $builder->addAssertion($assertableClass, [['foo']])->executeAssertions();
-    }
-
-    public static function assertablesToQueue(): array
-    {
-        return [
-            'does not use functions assertable' => [
-                'doesNotUseFunctions',
-                [['assert']],
-                DoesNotUseFunctions::class,
-            ],
-        ];
-    }
-
-    public static function assertablesToExecute(): array
-    {
-        return [
-            'does not use functions assertable' => [
-                DoesNotUseFunctions::class,
-            ],
-        ];
+        return collect([
+            new AssertablesToTestDto(
+                testName: 'does not use functions assertable',
+                assertable: DoesNotUseFunctions::class,
+                method: 'doesNotUseFunctions',
+                args: [['assert']],
+            )
+        ]);
     }
 }

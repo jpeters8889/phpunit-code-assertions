@@ -20,11 +20,9 @@ class DoesNotUseFunctions implements Assertable
         $this->failures = collect();
     }
 
-    public function assert(Collection $files): void
+    public function assert(PendingFile $file): void
     {
-        $files->each(function(PendingFile $file) {
-            $this->scanFileForMethodUsage($file);
-        });
+        $this->scanFileForMethodUsage($file);
 
         if ($this->failures->isNotEmpty()) {
             Assert::fail($this->failureMessage());
@@ -41,8 +39,8 @@ class DoesNotUseFunctions implements Assertable
     protected function failureMessage(): string
     {
         return $this->failures
-            ->map(fn(FileUsesFunction $fileUsesMethod) => "{$fileUsesMethod->filePath} uses function {$fileUsesMethod->functionName}()")
-            ->prepend('Failed asserting that path does not use functions')
+            ->map(fn(FileUsesFunction $fileUsesFunction) => "{$fileUsesFunction->filePath} uses function {$fileUsesFunction->functionName}()")
+            ->prepend('Failed asserting that a file does not use functions,')
             ->join("\n");
     }
 }
