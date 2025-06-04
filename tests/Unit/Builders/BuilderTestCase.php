@@ -46,7 +46,12 @@ abstract class BuilderTestCase extends TestCase
     #[Test]
     public function itCanGetACollectionOfPendingFilesToAssertAgainst(): void
     {
+        $builder = $this->makeBuilder('tests/Fixtures');
 
+        $invadedBuilder = invade($builder);
+
+        $this->assertInstanceOf(Collection::class, $invadedBuilder->collectFilesToAssertAgainst());
+        $this->assertInstanceOf(PendingFile::class, $invadedBuilder->collectFilesToAssertAgainst()->first());
     }
 
     #[Test]
@@ -68,75 +73,74 @@ abstract class BuilderTestCase extends TestCase
 
     #[Test]
     #[DataProvider('assertablesToQueue')]
-    public function itQueuesUpTheEachAssertable(string $method, array $args, string $assertableClass): void
+    public function itQueuesUpTheEachAssertable(AssertablesToTestDto $dto): void
     {
-        $builder = $this->makeBuilder('tests/Fixtures');
+        $builder = $this->makeBuilder($dto->builderParam ?: 'tests/Fixtures');
 
-        $builder->$method(...$args);
+        $builder->{$dto->method}(...$dto->args);
 
         $assertions = $builder->getAssertionsToMake();
 
         $this->assertCount(1, $assertions);
         $this->assertInstanceOf(PendingAssertion::class, $assertions->first());
-        $this->assertEquals($assertableClass, $assertions->first()->assertable);
+        $this->assertEquals($dto->assertable, $assertions->first()->assertable);
     }
 
     #[Test]
-    #[DataProvider('assertablesToExecute')]
-    public function itExecutesEachAssertionInTheShutdown(string $assertableClass): void
+    #[DataProvider('assertablesToQueue')]
+    public function itExecutesEachAssertionInTheShutdown(AssertablesToTestDto $dto): void
     {
-        $mock = Mockery::mock($assertableClass)
+        $mock = Mockery::mock($dto->assertable)
             ->shouldReceive('assert')
-            ->withArgs(function($file) {
+            ->withArgs(function($file, $negate = false) use ($dto) {
                 $this->assertInstanceOf(PendingFile::class, $file);
+                $this->assertEquals($dto->negate, $negate);
 
                 return true;
             })
             ->once();
 
-        AssertableFactory::register($assertableClass, $mock->getMock());
+        AssertableFactory::register($dto->assertable, $mock->getMock());
 
-        $builder = $this->makeBuilder('tests/Fixtures');
+        $builder = $this->makeBuilder($dto->builderParam ?: 'tests/Fixtures');
 
-        $builder->addAssertion($assertableClass, [['foo']]);
+        $builder->addAssertion($dto->assertable, $dto->negate, [['foo']]);
 
         unset($builder);
     }
 
     #[Test]
-    #[DataProvider('assertablesToExecute')]
-    public function itCanExecuteEachAssertionByManuallyTriggering(string $assertableClass): void
+    #[DataProvider('assertablesToQueue')]
+    public function itCanExecuteEachAssertionByManuallyTriggering(AssertablesToTestDto $dto): void
     {
-        $mock = Mockery::mock($assertableClass)
+        $mock = Mockery::mock($dto->assertable)
             ->shouldReceive('assert')
-            ->withArgs(function($file) {
+            ->withArgs(function($file, $negate) use ($dto) {
                 $this->assertInstanceOf(PendingFile::class, $file);
+                $this->assertEquals($dto->negate, $negate);
 
                 return true;
             })
             ->once();
 
-        AssertableFactory::register($assertableClass, $mock->getMock());
+        AssertableFactory::register($dto->assertable, $mock->getMock());
 
-        $builder = $this->makeBuilder('tests/Fixtures');
+        $builder = $this->makeBuilder($dto->builderParam ?: 'tests/Fixtures');
 
-        $builder->addAssertion($assertableClass, [['foo']])->executeAssertions();
+        $builder->addAssertion($dto->assertable, $dto->negate, [['foo']])->executeAssertions();
     }
 
     public static function assertablesToQueue(): array
     {
         return static::getAssertablesToQueue()
-            ->mapWithKeys(fn(AssertablesToTestDto $assertableToTestDto) => [$assertableToTestDto->testName => [
-                $assertableToTestDto->method,
-                $assertableToTestDto->args,
-                $assertableToTestDto->assertable
-            ]])->toArray();
+            ->mapWithKeys(fn(AssertablesToTestDto $dto) => [$dto->testName => [$dto]])
+            ->toArray();
     }
 
-    public static function assertablesToExecute(): array
+    protected function tearDown(): void
     {
-        return static::getAssertablesToQueue()
-            ->mapWithKeys(fn(AssertablesToTestDto $assertableToTestDto) => [$assertableToTestDto->testName => [$assertableToTestDto->assertable]])
-            ->toArray();
+        AssertableFactory::clear();
+
+        parent::tearDown();
     }
 }

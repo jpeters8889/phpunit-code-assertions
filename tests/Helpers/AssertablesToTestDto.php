@@ -13,7 +13,9 @@ readonly class AssertablesToTestDto
         public string $testName,
         public string $assertable,
         public string $method,
+        public bool $negate = false,
         public array $args = [],
+        public ?string $builderParam = null,
     )
     {
         //

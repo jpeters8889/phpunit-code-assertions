@@ -91,9 +91,9 @@ abstract class Builder
     }
 
     /** @param class-string<Assertable> $assertion */
-    public function addAssertion(string $assertion, array $args = []): self
+    public function addAssertion(string $assertion, bool $negate = false, array $args = []): self
     {
-        $this->assertionsToMake->push(new PendingAssertion($assertion, $args));
+        $this->assertionsToMake->push(new PendingAssertion($assertion, $negate, $args));
 
         return $this;
     }
@@ -108,7 +108,7 @@ abstract class Builder
         $this->collectFilesToAssertAgainst()->each(function(PendingFile $file) {
             $this->assertionsToMake
                 ->map(fn(PendingAssertion $pendingAssertion) => AssertableFactory::make($pendingAssertion->assertable, $pendingAssertion->args))
-                ->each(fn(Assertable $assertion) => $assertion->assert($file));
+                ->each(fn(Assertable $assertion, int $index) => $assertion->assert($file, $this->assertionsToMake[$index]->negate));
         });
 
         $this->hasExecutedAssertions = true;

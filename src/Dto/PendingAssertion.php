@@ -11,6 +11,7 @@ readonly class PendingAssertion
      */
     public function __construct(
         public string $assertable,
+        public bool $negate = false,
         public array $args = [],
     )
     {

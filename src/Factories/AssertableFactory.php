@@ -14,15 +14,16 @@ class AssertableFactory
             return static::$instances[$assertable];
         }
 
-        $concrete = new $assertable(...$args);
-
-        static::$instances[$assertable] = $concrete;
-
-        return $concrete;
+        return new $assertable(...$args);
     }
 
     public static function register(string $assertable, Assertable $concrete): void
     {
         static::$instances[$assertable] = $concrete;
+    }
+
+    public static function clear(): void
+    {
+        static::$instances = [];
     }
 }
