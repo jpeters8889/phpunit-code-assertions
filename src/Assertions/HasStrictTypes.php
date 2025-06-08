@@ -23,7 +23,6 @@ class HasStrictTypes implements Assertable
 
         $namespaceNode = (new NodeFinder())->findFirstInstanceOf($ast, Namespace_::class);
 
-        /** @var Class_ $class */
         $class = Arr::first((new NodeFinder())->findInstanceOf($ast, Class_::class));
 
         if ($class && $namespaceNode && in_array($namespaceNode->name->toString() . '\\' . $class->name->toString(), $except, true)) {
@@ -40,7 +39,9 @@ class HasStrictTypes implements Assertable
 
         $declarations = collect((new NodeFinder())->findInstanceOf($ast, Declare_::class))
             ->map(
+                /** @phpstan-ignore-next-line  */
                 fn (Declare_ $declare) => collect($declare->declares)
+                    /** @phpstan-ignore-next-line  */
                     ->mapWithKeys(fn (DeclareItem $declaration) => [$declaration->key->name => $declaration->value->value])
                     ->filter()
             )

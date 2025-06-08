@@ -37,7 +37,7 @@ abstract class AssertableBuilder
         $this->assertionsToMake = collect();
     }
 
-    protected function normalisePath($pathOrNamespace): void
+    protected function normalisePath(string $pathOrNamespace): void
     {
         if (str_contains($pathOrNamespace, '\\')) {
             $this->resolvePathsFromNamespace($pathOrNamespace);
@@ -49,12 +49,16 @@ abstract class AssertableBuilder
         $this->absolutePath = $this->getAbsolutePath($this->localPath);
     }
 
-    protected function resolvePathsFromNamespace($pathOrNamespace): void
+    protected function resolvePathsFromNamespace(string $pathOrNamespace): void
     {
         $basePath = $this->getAbsolutePath('');
-        $rootNamespace = Str::of($pathOrNamespace)->before('\\')->append('\\');
+        $rootNamespace = Str::of($pathOrNamespace)->before('\\')->append('\\')->toString();
 
-        $path = collect(include $basePath . 'vendor/composer/autoload_psr4.php')
+        /** @var Collection<string, string> $loadedClasses */
+        /** @phpstan-ignore-next-line  */
+        $loadedClasses = collect(include $basePath . 'vendor/composer/autoload_psr4.php');
+
+        $path = $loadedClasses
             ->filter(fn ($path, $namespace) => Str::startsWith($namespace, $rootNamespace) && Str::contains($pathOrNamespace, $namespace))
             ->first();
 
@@ -62,8 +66,8 @@ abstract class AssertableBuilder
             ->append('/')
             ->when(
                 $rootNamespace === 'App',
-                fn (Stringable $string) => $string->append(Str::of($pathOrNamespace)->after($rootNamespace)),
-                fn (Stringable $string) => $string->append(Str::of($pathOrNamespace)->after($rootNamespace)->after('\\')),
+                fn (Stringable $string) => $string->append(Str::of($pathOrNamespace)->after($rootNamespace)->toString()),
+                fn (Stringable $string) => $string->append(Str::of($pathOrNamespace)->after($rootNamespace)->after('\\')->toString()),
             )
             ->replace('\\', '/')
             ->toString();
@@ -87,28 +91,32 @@ abstract class AssertableBuilder
                 localPath: Str::of($file->getPathname())->after($this->absolutePath)->ltrim('/')->toString(),
                 absolutePath: $file->getPathname(),
                 contents: $file->getContents(),
-                fqns: null,
-            ));
+            ))
+            ->values();
     }
 
-    /** @param class-string<Assertable> $assertion */
-    public function addAssertion(string $assertion, bool $negate = false, array $args = []): self
+    /**
+     * @param class-string<Assertable> $assertion
+     * @param array<mixed> $args
+     */
+    public function addAssertion(string $assertion, bool $negate = false, array $args = []): static
     {
         $this->assertionsToMake->push(new PendingAssertion($assertion, $negate, $args));
 
         return $this;
     }
 
-    public function except(string|array $fqns): self
+    /**
+     * @param string|class-string|array<string|class-string> $fqns
+     */
+    public function except(string|array $fqns): static
     {
-        /** @var ?PendingAssertion $mostRecentAssetion */
-        $mostRecentAssertion = $this->assertionsToMake->last();
+        /** @var PendingAssertion | null $mostRecentAssertion */
+        $mostRecentAssertion = $this->assertionsToMake->pop();
 
         if ( ! $mostRecentAssertion) {
-            Assert::fail("Can't us except without an assertion");
+            Assert::fail("Can't chain except without an assertion");
         }
-
-        $this->assertionsToMake->pop();
 
         $this->assertionsToMake->push(new PendingAssertion(
             $mostRecentAssertion->assertable,
@@ -120,6 +128,7 @@ abstract class AssertableBuilder
         return $this;
     }
 
+    /** @return Collection<int, PendingAssertion> */
     public function getAssertionsToMake(): Collection
     {
         return $this->assertionsToMake;

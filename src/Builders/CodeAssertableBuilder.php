@@ -9,22 +9,24 @@ use Jpeters8889\PhpUnitCodeAssertions\Assertions\UsesFunctions;
 
 class CodeAssertableBuilder extends AssertableBuilder
 {
-    public function usesFunctions(array $methods): self
+    /** @param string[] $functions */
+    public function usesFunctions(array $functions): static
     {
-        return $this->addAssertion(UsesFunctions::class, args: [$methods]);
+        return $this->addAssertion(UsesFunctions::class, args: [$functions]);
     }
 
-    public function doesNotUseFunctions(array $methods): self
+    /** @param string[] $functions */
+    public function doesNotUseFunctions(array $functions): static
     {
-        return $this->addAssertion(UsesFunctions::class, negate: true, args: [$methods]);
+        return $this->addAssertion(UsesFunctions::class, negate: true, args: [$functions]);
     }
 
-    public function toUseStrictTypes(): self
+    public function toUseStrictTypes(): static
     {
         return $this->addAssertion(HasStrictTypes::class);
     }
 
-    public function toNotUseStrictTypes(): self
+    public function toNotUseStrictTypes(): static
     {
         return $this->addAssertion(HasStrictTypes::class, negate: true);
     }

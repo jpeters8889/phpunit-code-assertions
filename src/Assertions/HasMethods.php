@@ -18,8 +18,10 @@ use PHPUnit\Framework\Assert;
 
 class HasMethods implements Assertable
 {
+    /** @var Collection<int, FileUsesFunction> */
     protected Collection $failures;
 
+    /** @param string[] $methods */
     public function __construct(protected array $methods)
     {
         $this->failures = collect();

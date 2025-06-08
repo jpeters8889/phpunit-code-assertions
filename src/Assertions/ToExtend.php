@@ -29,7 +29,7 @@ class ToExtend implements Assertable
 
         collect((new NodeFinder())->findInstanceOf($ast, Class_::class))
             ->reject(fn (Class_ $class) => in_array($namespaceNode->name->toString() . '\\' . $class->name->toString(), $except, true))
-            ->filter(fn (Class_ $class) => collect(is_array($class->extends) ? $class->extends : [$class->extends])
+            ->filter(fn (Class_ $class) => collect([$class->extends])
                 ->map(fn (?Name $extendedClass) => $extendedClass?->name)
                 ->contains(class_basename($this->class)))
             ->when(

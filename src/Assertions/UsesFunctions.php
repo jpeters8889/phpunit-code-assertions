@@ -22,9 +22,11 @@ class UsesFunctions implements Assertable
 {
     use RetrievesFiles;
 
+    /** @var Collection<int, FileUsesFunction> */
     protected Collection $failures;
 
-    public function __construct(protected array $methods)
+    /** @param string[] $functions */
+    public function __construct(protected array $functions)
     {
         $this->failures = collect();
     }
@@ -40,13 +42,13 @@ class UsesFunctions implements Assertable
         Assert::assertTrue(true);
     }
 
+    /** @param array<string|class-string> $except */
     protected function scanFileForMethodUsage(PendingFile $file, bool $negate, array $except): void
     {
         $ast = PhpFileParser::parse($file->contents);
 
         $namespaceNode = (new NodeFinder())->findFirstInstanceOf($ast, Namespace_::class);
 
-        /** @var Class_ $class */
         $class = Arr::first((new NodeFinder())->findInstanceOf($ast, Class_::class));
 
         if ($class && $namespaceNode && in_array($namespaceNode->name->toString() . '\\' . $class->name->toString(), $except, true)) {
@@ -61,20 +63,20 @@ class UsesFunctions implements Assertable
             return;
         }
 
-        $matches = collect($this->methods)->mapWithKeys(fn ($method) => [$method => false])->toArray();
+        $matches = collect($this->functions)->mapWithKeys(fn ($method) => [$method => false])->toArray();
 
         collect((new NodeFinder())->findInstanceOf($ast, FuncCall::class))
             ->filter(fn (FuncCall $call) => $call->name instanceof Name)
             ->each(function (FuncCall $call) use ($file, &$matches, $negate): void {
                 if ($negate) {
-                    if (in_array($call->name->toString(), $this->methods, true)) {
+                    if (in_array($call->name->toString(), $this->functions, true)) {
                         $this->failures->push(new FileUsesFunction($file->localPath, $call->name->toString()));
                     }
 
                     return;
                 }
 
-                if (in_array($call->name->toString(), $this->methods, true)) {
+                if (in_array($call->name->toString(), $this->functions, true)) {
                     $matches[$call->name->toString()] = true;
                 }
 

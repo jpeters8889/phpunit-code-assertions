@@ -11,7 +11,6 @@ readonly class PendingFile
         public string $localPath,
         public string $absolutePath,
         public string $contents,
-        public ?string $fqns = null,
     ) {
         //
     }
