@@ -1,15 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Assertions;
 
-use Composer\Autoload\ClassLoader;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreClasses;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreTraits;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasStrictTypes;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\IsAbstract;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\UsesFunctions;
 use Jpeters8889\PhpUnitCodeAssertions\Concerns\GetsAbsolutePath;
-use Jpeters8889\PhpUnitCodeAssertions\Concerns\RetrievesFiles;
 use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
 use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\StrictClass\MyClass;
 use PHPUnit\Framework\AssertionFailedError;

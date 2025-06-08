@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Assertions;
 
 use Illuminate\Support\Collection;
@@ -20,13 +22,15 @@ class AreInterfaces implements Assertable
         $namespaceNode = (new NodeFinder())->findFirstInstanceOf($ast, Namespace_::class);
 
         collect((new NodeFinder())->findInstanceOf($ast, Interface_::class))
-            ->reject(fn(Interface_ $interface) => in_array($namespaceNode->name->toString().'\\'.$interface->name->toString(), $except, true))
-            ->when(fn(Collection $collection) => ($collection->isNotEmpty() && count($except) > 0) || count($except) === 0, fn(Collection $collection) => $collection
+            ->reject(fn (Interface_ $interface) => in_array($namespaceNode->name->toString() . '\\' . $interface->name->toString(), $except, true))
             ->when(
-                !$negate,
-                fn(Collection $nodes) => $nodes->whenEmpty(fn() => Assert::fail("{$file->localPath} is not an interface")),
-                fn(Collection $nodes) => $nodes->whenNotEmpty(fn() => Assert::fail("{$file->localPath} is an interface")),
-            )
+                fn (Collection $collection) => ($collection->isNotEmpty() && count($except) > 0) || count($except) === 0,
+                fn (Collection $collection) => $collection
+                    ->when(
+                        ! $negate,
+                        fn (Collection $nodes) => $nodes->whenEmpty(fn () => Assert::fail("{$file->localPath} is not an interface")),
+                        fn (Collection $nodes) => $nodes->whenNotEmpty(fn () => Assert::fail("{$file->localPath} is an interface")),
+                    )
             );
 
         Assert::assertTrue(true);

@@ -1,8 +1,8 @@
 <?php
 
-namespace Jpeters8889\PhpUnitCodeAssertions\Tests;
+declare(strict_types=1);
 
-use ReflectionClass;
+namespace Jpeters8889\PhpUnitCodeAssertions\Tests;
 
 class TestCase extends \PHPUnit\Framework\TestCase
 {

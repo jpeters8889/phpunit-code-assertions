@@ -1,5 +1,8 @@
 {
     "preset": "psr12",
+    "exclude": [
+        "tests/Fixtures"
+    ],
     "rules": {
         "align_multiline_comment": true,
         "array_indentation": true,

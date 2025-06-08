@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Helpers;
 
 use Jpeters8889\PhpUnitCodeAssertions\Contracts\Assertable;
@@ -16,8 +18,7 @@ readonly class AssertablesToTestDto
         public bool $negate = false,
         public array $args = [],
         public ?string $builderParam = null,
-    )
-    {
+    ) {
         //
     }
 }

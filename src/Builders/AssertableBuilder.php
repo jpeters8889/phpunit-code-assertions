@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Builders;
 
 use Illuminate\Support\Collection;
@@ -53,23 +55,21 @@ abstract class AssertableBuilder
         $rootNamespace = Str::of($pathOrNamespace)->before('\\')->append('\\');
 
         $path = collect(include $basePath . 'vendor/composer/autoload_psr4.php')
-            ->filter(function ($path, $namespace) use ($rootNamespace, $pathOrNamespace) {
-                return Str::startsWith($namespace, $rootNamespace) && Str::contains($pathOrNamespace, $namespace);
-            })
+            ->filter(fn ($path, $namespace) => Str::startsWith($namespace, $rootNamespace) && Str::contains($pathOrNamespace, $namespace))
             ->first();
 
         $pathOrNamespace = Str::of($path[0])
             ->append('/')
             ->when(
                 $rootNamespace === 'App',
-                fn(Stringable $string) => $string->append(Str::of($pathOrNamespace)->after($rootNamespace)),
-                fn(Stringable $string) => $string->append(Str::of($pathOrNamespace)->after($rootNamespace)->after('\\')),
+                fn (Stringable $string) => $string->append(Str::of($pathOrNamespace)->after($rootNamespace)),
+                fn (Stringable $string) => $string->append(Str::of($pathOrNamespace)->after($rootNamespace)->after('\\')),
             )
             ->replace('\\', '/')
             ->toString();
 
         $this->absolutePath = $pathOrNamespace;
-        $this->localPath = Str::of($pathOrNamespace)->after($basePath);
+        $this->localPath = Str::of($pathOrNamespace)->after($basePath)->toString();
     }
 
     protected function isFileTestable(SplFileInfo $file): bool
@@ -82,9 +82,9 @@ abstract class AssertableBuilder
     {
         return collect($this->getFiles($this->absolutePath)->name('*.php')->getIterator())
             ->filter($this->isFileTestable(...))
-            ->map(fn(SplFileInfo $file) => new PendingFile(
+            ->map(fn (SplFileInfo $file) => new PendingFile(
                 fileName: $file->getFilename(),
-                localPath: Str::of($file->getPathname())->after($this->absolutePath)->ltrim('/'),
+                localPath: Str::of($file->getPathname())->after($this->absolutePath)->ltrim('/')->toString(),
                 absolutePath: $file->getPathname(),
                 contents: $file->getContents(),
                 fqns: null,
@@ -104,7 +104,7 @@ abstract class AssertableBuilder
         /** @var ?PendingAssertion $mostRecentAssetion */
         $mostRecentAssertion = $this->assertionsToMake->last();
 
-        if(!$mostRecentAssertion) {
+        if ( ! $mostRecentAssertion) {
             Assert::fail("Can't us except without an assertion");
         }
 
@@ -127,10 +127,10 @@ abstract class AssertableBuilder
 
     public function executeAssertions(): void
     {
-        $this->collectFilesToAssertAgainst()->each(function(PendingFile $file) {
+        $this->collectFilesToAssertAgainst()->each(function (PendingFile $file): void {
             $this->assertionsToMake
-                ->map(fn(PendingAssertion $pendingAssertion) => AssertableFactory::make($pendingAssertion->assertable, $pendingAssertion->args))
-                ->each(fn(Assertable $assertion, int $index) => $assertion->assert($file, $this->assertionsToMake[$index]->negate, $this->assertionsToMake[$index]->except));
+                ->map(fn (PendingAssertion $pendingAssertion) => AssertableFactory::make($pendingAssertion->assertable, $pendingAssertion->args))
+                ->each(fn (Assertable $assertion, int $index) => $assertion->assert($file, $this->assertionsToMake[$index]->negate, $this->assertionsToMake[$index]->except));
         });
 
         $this->hasExecutedAssertions = true;

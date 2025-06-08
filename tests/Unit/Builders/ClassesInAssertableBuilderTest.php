@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Builders;
 
-use Hamcrest\Type\IsResource;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreClasses;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreInterfaces;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreTraits;
@@ -41,7 +42,7 @@ class ClassesInAssertableBuilderTest extends AssertableBuilderTestCase
 
         $files = $invadedBuilder
             ->collectFilesToAssertAgainst()
-            ->map(fn(PendingFile $file) => $file->fileName)
+            ->map(fn (PendingFile $file) => $file->fileName)
             ->toArray();
 
         $this->assertNotContains('functions.php', $files);

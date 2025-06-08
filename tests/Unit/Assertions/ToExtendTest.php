@@ -1,14 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Assertions;
 
-use Composer\Autoload\ClassLoader;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreClasses;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreTraits;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\ToExtend;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\UsesFunctions;
 use Jpeters8889\PhpUnitCodeAssertions\Concerns\GetsAbsolutePath;
-use Jpeters8889\PhpUnitCodeAssertions\Concerns\RetrievesFiles;
 use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
 use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\AbstractClass\AbstractClass;
 use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\ClassExtend\ExtendedClass;
@@ -27,7 +24,7 @@ class ToExtendTest extends TestCase
         $assertion = new ToExtend(AbstractClass::class);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('tests/Fixtures/MyClass.php does not extend '.AbstractClass::class);
+        $this->expectExceptionMessage('tests/Fixtures/MyClass.php does not extend ' . AbstractClass::class);
 
         $assertion->assert(new PendingFile(
             fileName: 'MyClass.php',
@@ -73,7 +70,7 @@ class ToExtendTest extends TestCase
         $assertion = new ToExtend(AbstractClass::class);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('tests/Fixtures/ClassExtend/ExtendedClass.php extends '.AbstractClass::class);
+        $this->expectExceptionMessage('tests/Fixtures/ClassExtend/ExtendedClass.php extends ' . AbstractClass::class);
 
         $assertion->assert(new PendingFile(
             fileName: 'ExtendedClass.php',

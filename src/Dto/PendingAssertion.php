@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Dto;
 
 use Jpeters8889\PhpUnitCodeAssertions\Contracts\Assertable;
@@ -14,8 +16,7 @@ readonly class PendingAssertion
         public bool $negate = false,
         public array $args = [],
         public array $except = [],
-    )
-    {
+    ) {
         //
     }
 }

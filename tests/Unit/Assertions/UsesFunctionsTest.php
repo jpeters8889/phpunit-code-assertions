@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Assertions;
 
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\UsesFunctions;

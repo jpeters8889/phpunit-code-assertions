@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Builders;
 
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasStrictTypes;

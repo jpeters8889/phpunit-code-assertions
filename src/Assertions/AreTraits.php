@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Assertions;
 
 use Illuminate\Support\Collection;
@@ -20,13 +22,15 @@ class AreTraits implements Assertable
         $namespaceNode = (new NodeFinder())->findFirstInstanceOf($ast, Namespace_::class);
 
         collect((new NodeFinder())->findInstanceOf($ast, Trait_::class))
-            ->reject(fn(Trait_ $trait) => in_array($namespaceNode->name->toString().'\\'.$trait->name->toString(), $except, true))
-            ->when(fn(Collection $collection) => ($collection->isNotEmpty() && count($except) > 0) || count($except) === 0, fn(Collection $collection) => $collection
+            ->reject(fn (Trait_ $trait) => in_array($namespaceNode->name->toString() . '\\' . $trait->name->toString(), $except, true))
             ->when(
-                !$negate,
-                fn(Collection $nodes) => $nodes->whenEmpty(fn() => Assert::fail("{$file->localPath} is not a trait")),
-                fn(Collection $nodes) => $nodes->whenNotEmpty(fn() => Assert::fail("{$file->localPath} is a trait")),
-            )
+                fn (Collection $collection) => ($collection->isNotEmpty() && count($except) > 0) || count($except) === 0,
+                fn (Collection $collection) => $collection
+                    ->when(
+                        ! $negate,
+                        fn (Collection $nodes) => $nodes->whenEmpty(fn () => Assert::fail("{$file->localPath} is not a trait")),
+                        fn (Collection $nodes) => $nodes->whenNotEmpty(fn () => Assert::fail("{$file->localPath} is a trait")),
+                    )
             );
 
         Assert::assertTrue(true);

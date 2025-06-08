@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Code;
 
 use Jpeters8889\PhpUnitCodeAssertions\Builders\AssertableBuilder;

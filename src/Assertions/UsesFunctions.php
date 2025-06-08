@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Assertions;
 
 use Illuminate\Support\Arr;
@@ -47,24 +49,24 @@ class UsesFunctions implements Assertable
         /** @var Class_ $class */
         $class = Arr::first((new NodeFinder())->findInstanceOf($ast, Class_::class));
 
-        if($class && $namespaceNode && in_array($namespaceNode->name->toString().'\\'.$class->name->toString(), $except, true)) {
+        if ($class && $namespaceNode && in_array($namespaceNode->name->toString() . '\\' . $class->name->toString(), $except, true)) {
             Assert::assertTrue(true);
 
             return;
         }
 
-        if(in_array($file->fileName, $except, true)) {
+        if (in_array($file->fileName, $except, true)) {
             Assert::assertTrue(true);
 
             return;
         }
 
-        $matches = collect($this->methods)->mapWithKeys(fn($method) => [$method => false])->toArray();
+        $matches = collect($this->methods)->mapWithKeys(fn ($method) => [$method => false])->toArray();
 
         collect((new NodeFinder())->findInstanceOf($ast, FuncCall::class))
-            ->filter(fn(FuncCall $call) => $call->name instanceof Name)
-            ->each(function (FuncCall $call) use ($file, &$matches, $negate) {
-                if($negate) {
+            ->filter(fn (FuncCall $call) => $call->name instanceof Name)
+            ->each(function (FuncCall $call) use ($file, &$matches, $negate): void {
+                if ($negate) {
                     if (in_array($call->name->toString(), $this->methods, true)) {
                         $this->failures->push(new FileUsesFunction($file->localPath, $call->name->toString()));
                     }
@@ -77,24 +79,25 @@ class UsesFunctions implements Assertable
                 }
 
                 collect($matches)
-                    ->reject(fn($match) => $match === true)
-                    ->whenNotEmpty(fn(Collection $matches) => $matches
-                        ->each(fn($match, $method) => $this->failures->push(new FileUsesFunction($file->localPath, $method)))
+                    ->reject(fn ($match) => $match === true)
+                    ->whenNotEmpty(
+                        fn (Collection $matches) => $matches
+                            ->each(fn ($match, $method) => $this->failures->push(new FileUsesFunction($file->localPath, $method)))
                     );
             });
     }
 
-    protected function failureMessage(string $negated): string
+    protected function failureMessage(bool $negated): string
     {
         return $this->failures
-            ->unique(fn(FileUsesFunction $fileUsesFunction) => $fileUsesFunction->filePath . $fileUsesFunction->functionName)
+            ->unique(fn (FileUsesFunction $fileUsesFunction) => $fileUsesFunction->filePath . $fileUsesFunction->functionName)
             ->when(
                 $negated,
-                fn(Collection $failures) => $failures
-                    ->map(fn(FileUsesFunction $fileUsesFunction) => "{$fileUsesFunction->filePath} uses function {$fileUsesFunction->functionName}()")
+                fn (Collection $failures) => $failures
+                    ->map(fn (FileUsesFunction $fileUsesFunction) => "{$fileUsesFunction->filePath} uses function {$fileUsesFunction->functionName}()")
                     ->prepend("Failed asserting that a file does not use functions,"),
-                fn(Collection $failures) => $failures
-                    ->map(fn(FileUsesFunction $fileUsesFunction) => "{$fileUsesFunction->filePath} does not use function {$fileUsesFunction->functionName}()")
+                fn (Collection $failures) => $failures
+                    ->map(fn (FileUsesFunction $fileUsesFunction) => "{$fileUsesFunction->filePath} does not use function {$fileUsesFunction->functionName}()")
                     ->prepend("Failed asserting that a file uses functions,"),
             )
             ->join("\n");

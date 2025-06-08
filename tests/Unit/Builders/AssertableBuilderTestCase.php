@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Builders;
 
 use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\MockAssertable;
@@ -95,7 +97,7 @@ abstract class AssertableBuilderTestCase extends TestCase
     {
         $mock = Mockery::mock($dto->assertable)
             ->shouldReceive('assert')
-            ->withArgs(function($file, $negate = false) use ($dto) {
+            ->withArgs(function ($file, $negate = false) use ($dto) {
                 $this->assertInstanceOf(PendingFile::class, $file);
                 $this->assertEquals($dto->negate, $negate);
 
@@ -118,7 +120,7 @@ abstract class AssertableBuilderTestCase extends TestCase
     {
         $mock = Mockery::mock($dto->assertable)
             ->shouldReceive('assert')
-            ->withArgs(function($file, $negate) use ($dto) {
+            ->withArgs(function ($file, $negate) use ($dto) {
                 $this->assertInstanceOf(PendingFile::class, $file);
                 $this->assertEquals($dto->negate, $negate);
 
@@ -164,7 +166,7 @@ abstract class AssertableBuilderTestCase extends TestCase
     public static function assertablesToQueue(): array
     {
         return static::getAssertablesToQueue()
-            ->mapWithKeys(fn(AssertablesToTestDto $dto) => [$dto->testName => [$dto]])
+            ->mapWithKeys(fn (AssertablesToTestDto $dto) => [$dto->testName => [$dto]])
             ->toArray();
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Dto;
 
 readonly class PendingFile
@@ -10,8 +12,7 @@ readonly class PendingFile
         public string $absolutePath,
         public string $contents,
         public ?string $fqns = null,
-    )
-    {
+    ) {
         //
     }
 }

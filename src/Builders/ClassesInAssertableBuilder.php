@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Builders;
 
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreClasses;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreInterfaces;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreTraits;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasMethods;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasStrictTypes;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasSuffix;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\IsAbstract;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\IsFinal;
@@ -15,10 +16,8 @@ use Jpeters8889\PhpUnitCodeAssertions\Assertions\OnlyHaveMethod;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\ToExtend;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\ToImplement;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\ToUse;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\UsesFunctions;
 use Jpeters8889\PhpUnitCodeAssertions\Factories\PhpFileParser;
 use PhpParser\Node\Expr\Error;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\NodeFinder;
 use PHPUnit\Framework\Assert;
@@ -193,7 +192,7 @@ class ClassesInAssertableBuilder extends CodeAssertableBuilder
 
             $classes = (new NodeFinder())->findInstanceOf($ast, Namespace_::class);
 
-            if(count($classes) === 0) {
+            if (count($classes) === 0) {
                 return false;
             }
         } catch (Error) {

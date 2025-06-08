@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jpeters8889\PhpUnitCodeAssertions\Assertions;
 
 use Illuminate\Support\Collection;
@@ -28,21 +30,23 @@ class ToImplement implements Assertable
         $namespaceNode = (new NodeFinder())->findFirstInstanceOf($ast, Namespace_::class);
 
         $uses = collect((new NodeFinder())->findInstanceOf($ast, Use_::class))
-            ->map(fn(Use_ $foo) => collect($foo->uses)->map(fn(UseItem $use) => $use->name->name))
+            ->map(fn (Use_ $foo) => collect($foo->uses)->map(fn (UseItem $use) => $use->name->name))
             ->flatten();
 
         collect((new NodeFinder())->findInstanceOf($ast, Class_::class))
-            ->reject(fn(Class_ $class) => in_array($namespaceNode->name->toString().'\\'.$class->name->toString(), $except, true))
-            ->filter(fn() => $uses->contains($this->interface))
-            ->filter(fn(Class_ $class) => collect($class->implements)
-                ->map(fn(Name $interface) => $interface->name)
+            ->reject(fn (Class_ $class) => in_array($namespaceNode->name->toString() . '\\' . $class->name->toString(), $except, true))
+            ->filter(fn () => $uses->contains($this->interface))
+            ->filter(fn (Class_ $class) => collect($class->implements)
+                ->map(fn (Name $interface) => $interface->name)
                 ->contains(class_basename($this->interface)))
-            ->when(fn(Collection $collection) => ($collection->isNotEmpty() && count($except) > 0) || count($except) === 0, fn(Collection $collection) => $collection
             ->when(
-                !$negate,
-                fn(Collection $nodes) => $nodes->whenEmpty(fn() => Assert::fail("{$file->localPath} does not implement {$this->interface}")),
-                fn(Collection $nodes) => $nodes->whenNotEmpty(fn() => Assert::fail("{$file->localPath} implements {$this->interface}")),
-            )
+                fn (Collection $collection) => ($collection->isNotEmpty() && count($except) > 0) || count($except) === 0,
+                fn (Collection $collection) => $collection
+                    ->when(
+                        ! $negate,
+                        fn (Collection $nodes) => $nodes->whenEmpty(fn () => Assert::fail("{$file->localPath} does not implement {$this->interface}")),
+                        fn (Collection $nodes) => $nodes->whenNotEmpty(fn () => Assert::fail("{$file->localPath} implements {$this->interface}")),
+                    )
             );
 
         Assert::assertTrue(true);
