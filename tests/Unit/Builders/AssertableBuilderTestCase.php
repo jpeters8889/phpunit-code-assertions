@@ -3,7 +3,7 @@
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Builders;
 
 use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\MockAssertable;
-use Jpeters8889\PhpUnitCodeAssertions\Builders\Builder;
+use Jpeters8889\PhpUnitCodeAssertions\Builders\AssertableBuilder;
 use Jpeters8889\PhpUnitCodeAssertions\Concerns\GetsAbsolutePath;
 use Jpeters8889\PhpUnitCodeAssertions\Tests\Helpers\AssertablesToTestDto;
 use Illuminate\Support\Collection;
@@ -15,11 +15,11 @@ use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
-abstract class BuilderTestCase extends TestCase
+abstract class AssertableBuilderTestCase extends TestCase
 {
     use GetsAbsolutePath;
 
-    abstract protected function makeBuilder(string $pathOrNamespace): Builder;
+    abstract protected function makeBuilder(string $pathOrNamespace): AssertableBuilder;
 
     #[Test]
     public function itWillComputeTheAbsoluteAndLocalPathsFromANamespace(): void
@@ -84,6 +84,9 @@ abstract class BuilderTestCase extends TestCase
         $this->assertCount(1, $assertions);
         $this->assertInstanceOf(PendingAssertion::class, $assertions->first());
         $this->assertEquals($dto->assertable, $assertions->first()->assertable);
+
+        $invadedBuilder = invade($builder);
+        $invadedBuilder->assertionsToMake = collect();
     }
 
     #[Test]
@@ -128,6 +131,34 @@ abstract class BuilderTestCase extends TestCase
         $builder = $this->makeBuilder($dto->builderParam ?: 'tests/Fixtures');
 
         $builder->addAssertion($dto->assertable, $dto->negate, [['foo']])->executeAssertions();
+    }
+
+    #[Test]
+    #[DataProvider('assertablesToQueue')]
+    public function itCanChainOnAnExceptMethodToEachAssertable(AssertablesToTestDto $dto): void
+    {
+        $builder = $this->makeBuilder($dto->builderParam ?: 'tests/Fixtures');
+
+        $builder->addAssertion($dto->assertable, $dto->negate, [['foo']]);
+
+        $this->assertCount(1, $builder->getAssertionsToMake());
+
+        /** @var PendingAssertion $pendingAssertion */
+        $pendingAssertion = $builder->getAssertionsToMake()->first();
+
+        $this->assertEquals([], $pendingAssertion->except);
+
+        $builder->except(['foo']);
+
+        $this->assertCount(1, $builder->getAssertionsToMake());
+
+        /** @var PendingAssertion $pendingAssertion */
+        $pendingAssertion = $builder->getAssertionsToMake()->first();
+
+        $this->assertEquals(['foo'], $pendingAssertion->except);
+
+        $invadedBuilder = invade($builder);
+        $invadedBuilder->assertionsToMake = collect();
     }
 
     public static function assertablesToQueue(): array

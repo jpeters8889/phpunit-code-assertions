@@ -1,11 +1,10 @@
 <?php
 
-namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\Feature;
+namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\ClassUsesTrait;
 
-use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\Contracts\MyInterface;
 use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\Traits\MyTrait;
 
-class MyFeature implements MyInterface
+class ClassWithTrait
 {
     use MyTrait;
 

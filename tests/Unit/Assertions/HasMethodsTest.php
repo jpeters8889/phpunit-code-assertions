@@ -5,57 +5,55 @@ namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Assertions;
 use Composer\Autoload\ClassLoader;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreClasses;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreTraits;
-use Jpeters8889\PhpUnitCodeAssertions\Assertions\ToImplement;
+use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasMethods;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\UsesFunctions;
 use Jpeters8889\PhpUnitCodeAssertions\Concerns\GetsAbsolutePath;
 use Jpeters8889\PhpUnitCodeAssertions\Concerns\RetrievesFiles;
 use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
-use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\Contracts\MyInterface;
-use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\MockAssertable;
 use Jpeters8889\PhpUnitCodeAssertions\Tests\Fixtures\MyClass;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class ToImplementTest extends TestCase
+class HasMethodsTest extends TestCase
 {
     use GetsAbsolutePath;
 
     #[Test]
-    public function itCanDetectWhenAClassDoesNotImplementTheInterface(): void
+    public function itCanDetectWhenAClassDoesntHaveMethods(): void
     {
-        $assertion = new ToImplement(MyInterface::class);
+        $assertion = new HasMethods(['foo', 'bar']);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('tests/Fixtures/MockAssertable.php does not implement '.MyInterface::class);
+        $this->expectExceptionMessage("Failed asserting that a class has methods,\ntests/Fixtures/MyClass.php does not have method foo()\ntests/Fixtures/MyClass.php does not have method bar()");
 
         $assertion->assert(new PendingFile(
-            fileName: 'MockAssertable.php',
-            localPath: 'tests/Fixtures/MockAssertable.php',
-            absolutePath: 'tests/Fixtures/MockAssertable.php',
-            contents: file_get_contents($this->getAbsolutePath('tests/Fixtures/MockAssertable.php'))
+            fileName: 'MyClass.php',
+            localPath: 'tests/Fixtures/MyClass.php',
+            absolutePath: 'tests/Fixtures/MyClass.php',
+            contents: file_get_contents($this->getAbsolutePath('tests/Fixtures/MyClass.php'))
         ), false, []);
     }
 
     #[Test]
-    public function itDoesntErrorWhenAClassDoesNotImplementAnInterfaceWhenItIsExcluded(): void
+    public function itDoesntErrorWhenAFileDoesntHaveAMethodWhenItIsExcluded(): void
     {
-        $assertion = new ToImplement(MyInterface::class);
+        $assertion = new HasMethods(['foo', 'bar']);
 
         $assertion->assert(new PendingFile(
-            fileName: 'MockAssertable.php',
-            localPath: 'tests/Fixtures/MockAssertable.php',
-            absolutePath: 'tests/Fixtures/MockAssertable.php',
-            contents: file_get_contents($this->getAbsolutePath('tests/Fixtures/MockAssertable.php'))
-        ), false, [MockAssertable::class]);
+            fileName: 'MyClass.php',
+            localPath: 'tests/Fixtures/MyClass.php',
+            absolutePath: 'tests/Fixtures/MyClass.php',
+            contents: file_get_contents($this->getAbsolutePath('tests/Fixtures/MyClass.php'))
+        ), false, [MyClass::class]);
 
         $this->assertTrue(true);
     }
 
     #[Test]
-    public function itDoesntErrorIfAClassUsesTheInterface(): void
+    public function itDoesntErrorIfAClassHasTheGivenMethods(): void
     {
-        $assertion = new ToImplement(MyInterface::class);
+        $assertion = new HasMethods(['hello', 'bye']);
 
         $assertion->assert(new PendingFile(
             fileName: 'MyClass.php',
@@ -68,12 +66,12 @@ class ToImplementTest extends TestCase
     }
 
     #[Test]
-    public function itErrorsWhenAClassImplementsAnInterfaceWhenItShouldnt(): void
+    public function itErrorsWhenAClassHasMethodsWhenItShouldnt(): void
     {
-        $assertion = new ToImplement(MyInterface::class);
+        $assertion = new HasMethods(['hello', 'bye']);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('tests/Fixtures/MyClass.php implements '.MyInterface::class);
+        $this->expectExceptionMessage("ailed asserting that a class does not have methods,\ntests/Fixtures/MyClass.php has method hello()\ntests/Fixtures/MyClass.php has method bye()");
 
         $assertion->assert(new PendingFile(
             fileName: 'MyClass.php',
@@ -84,9 +82,9 @@ class ToImplementTest extends TestCase
     }
 
     #[Test]
-    public function itDoesntErrorWhenAFailingClassIsExcluded(): void
+    public function itDoesntErrorWhenAFailIsExcluded(): void
     {
-        $assertion = new ToImplement(MyInterface::class);
+        $assertion = new HasMethods(['hello', 'bye']);
 
         $assertion->assert(new PendingFile(
             fileName: 'MyClass.php',

@@ -2,9 +2,10 @@
 
 namespace Jpeters8889\PhpUnitCodeAssertions\Builders;
 
+use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasStrictTypes;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\UsesFunctions;
 
-class CodeAssertable extends Builder
+class CodeAssertableBuilder extends AssertableBuilder
 {
     public function usesFunctions(array $methods): self
     {
@@ -14,5 +15,15 @@ class CodeAssertable extends Builder
     public function doesNotUseFunctions(array $methods): self
     {
         return $this->addAssertion(UsesFunctions::class, negate: true, args: [$methods]);
+    }
+
+    public function toUseStrictTypes(): self
+    {
+        return $this->addAssertion(HasStrictTypes::class);
+    }
+
+    public function toNotUseStrictTypes(): self
+    {
+        return $this->addAssertion(HasStrictTypes::class, negate: true);
     }
 }

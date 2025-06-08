@@ -21,7 +21,7 @@ class UsesFunctionsTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage("Failed asserting that a file uses functions,\ntests/Fixtures/MyClass.php does not use function foo()");
 
-        $assertion->assert($this->pendingFileFactory());
+        $assertion->assert($this->pendingFileFactory(), false, []);
     }
 
     #[Test]
@@ -29,7 +29,7 @@ class UsesFunctionsTest extends TestCase
     {
         $assertion = new UsesFunctions(['ucwords']);
 
-        $assertion->assert($this->pendingFileFactory());
+        $assertion->assert($this->pendingFileFactory(), false, []);
 
         $this->assertTrue(true);
     }
@@ -42,7 +42,7 @@ class UsesFunctionsTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage("Failed asserting that a file does not use functions,\ntests/Fixtures/MyClass.php uses function ucwords()");
 
-        $assertion->assert($this->pendingFileFactory(), true);
+        $assertion->assert($this->pendingFileFactory(), true, []);
     }
 
     #[Test]
@@ -53,7 +53,7 @@ class UsesFunctionsTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage("Failed asserting that a file does not use functions,\ntests/Fixtures/MyClass.php uses function ucwords()\ntests/Fixtures/MyClass.php uses function lcfirst()");
 
-        $assertion->assert($this->pendingFileFactory(), true);
+        $assertion->assert($this->pendingFileFactory(), true, []);
     }
 
     #[Test]
@@ -61,7 +61,7 @@ class UsesFunctionsTest extends TestCase
     {
         $assertion = new UsesFunctions(['assert']);
 
-        $assertion->assert($this->pendingFileFactory(), true);
+        $assertion->assert($this->pendingFileFactory(), true, []);
 
         $this->assertTrue(true);
     }

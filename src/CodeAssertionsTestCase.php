@@ -2,19 +2,19 @@
 
 namespace Jpeters8889\PhpUnitCodeAssertions;
 
-use Jpeters8889\PhpUnitCodeAssertions\Builders\ClassesInAssertable;
-use Jpeters8889\PhpUnitCodeAssertions\Builders\CodeAssertable;
+use Jpeters8889\PhpUnitCodeAssertions\Builders\ClassesInAssertableBuilder;
+use Jpeters8889\PhpUnitCodeAssertions\Builders\CodeAssertableBuilder;
 use PHPUnit\Framework\TestCase;
 
 class CodeAssertionsTestCase extends TestCase
 {
-    public function assertCode(string $path = './app'): CodeAssertable
+    public function assertCode(string $path = './app'): CodeAssertableBuilder
     {
-        return new CodeAssertable($path);
+        return new CodeAssertableBuilder($path);
     }
 
-    public function assertClassesIn(string $pathOrNamespace)
+    public function assertClassesIn(string $pathOrNamespace): ClassesInAssertableBuilder
     {
-        return new ClassesInAssertable($pathOrNamespace);
+        return new ClassesInAssertableBuilder($pathOrNamespace);
     }
 }

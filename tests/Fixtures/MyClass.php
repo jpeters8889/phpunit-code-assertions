@@ -13,4 +13,9 @@ class MyClass implements MyInterface
     {
         return ucwords(lcfirst('hello'));
     }
+
+    public function bye(): string
+    {
+        return ucwords(lcfirst('hello'));
+    }
 }

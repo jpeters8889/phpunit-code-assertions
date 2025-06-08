@@ -13,6 +13,7 @@ readonly class PendingAssertion
         public string $assertable,
         public bool $negate = false,
         public array $args = [],
+        public array $except = [],
     )
     {
         //

@@ -11,9 +11,10 @@ use Jpeters8889\PhpUnitCodeAssertions\Contracts\Assertable;
 use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingAssertion;
 use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
 use Jpeters8889\PhpUnitCodeAssertions\Factories\AssertableFactory;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\Finder\SplFileInfo;
 
-abstract class Builder
+abstract class AssertableBuilder
 {
     use GetsAbsolutePath;
     use RetrievesFiles;
@@ -98,6 +99,27 @@ abstract class Builder
         return $this;
     }
 
+    public function except(string|array $fqns): self
+    {
+        /** @var ?PendingAssertion $mostRecentAssetion */
+        $mostRecentAssertion = $this->assertionsToMake->last();
+
+        if(!$mostRecentAssertion) {
+            Assert::fail("Can't us except without an assertion");
+        }
+
+        $this->assertionsToMake->pop();
+
+        $this->assertionsToMake->push(new PendingAssertion(
+            $mostRecentAssertion->assertable,
+            $mostRecentAssertion->negate,
+            $mostRecentAssertion->args,
+            except: is_array($fqns) ? $fqns : [$fqns],
+        ));
+
+        return $this;
+    }
+
     public function getAssertionsToMake(): Collection
     {
         return $this->assertionsToMake;
@@ -108,7 +130,7 @@ abstract class Builder
         $this->collectFilesToAssertAgainst()->each(function(PendingFile $file) {
             $this->assertionsToMake
                 ->map(fn(PendingAssertion $pendingAssertion) => AssertableFactory::make($pendingAssertion->assertable, $pendingAssertion->args))
-                ->each(fn(Assertable $assertion, int $index) => $assertion->assert($file, $this->assertionsToMake[$index]->negate));
+                ->each(fn(Assertable $assertion, int $index) => $assertion->assert($file, $this->assertionsToMake[$index]->negate, $this->assertionsToMake[$index]->except));
         });
 
         $this->hasExecutedAssertions = true;

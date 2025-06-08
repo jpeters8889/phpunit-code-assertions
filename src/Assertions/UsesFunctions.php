@@ -2,6 +2,7 @@
 
 namespace Jpeters8889\PhpUnitCodeAssertions\Assertions;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Jpeters8889\PhpUnitCodeAssertions\Concerns\RetrievesFiles;
 use Jpeters8889\PhpUnitCodeAssertions\Contracts\Assertable;
@@ -10,6 +11,8 @@ use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
 use Jpeters8889\PhpUnitCodeAssertions\Factories\PhpFileParser;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\NodeFinder;
 use PHPUnit\Framework\Assert;
 
@@ -24,18 +27,37 @@ class UsesFunctions implements Assertable
         $this->failures = collect();
     }
 
-    public function assert(PendingFile $file, bool $negate = false): void
+    public function assert(PendingFile $file, bool $negate = false, array $except = []): void
     {
-        $this->scanFileForMethodUsage($file, $negate);
+        $this->scanFileForMethodUsage($file, $negate, $except);
 
         if ($this->failures->isNotEmpty()) {
             Assert::fail($this->failureMessage($negate));
         }
+
+        Assert::assertTrue(true);
     }
 
-    protected function scanFileForMethodUsage(PendingFile $file, bool $negate): void
+    protected function scanFileForMethodUsage(PendingFile $file, bool $negate, array $except): void
     {
         $ast = PhpFileParser::parse($file->contents);
+
+        $namespaceNode = (new NodeFinder())->findFirstInstanceOf($ast, Namespace_::class);
+
+        /** @var Class_ $class */
+        $class = Arr::first((new NodeFinder())->findInstanceOf($ast, Class_::class));
+
+        if($class && $namespaceNode && in_array($namespaceNode->name->toString().'\\'.$class->name->toString(), $except, true)) {
+            Assert::assertTrue(true);
+
+            return;
+        }
+
+        if(in_array($file->fileName, $except, true)) {
+            Assert::assertTrue(true);
+
+            return;
+        }
 
         $matches = collect($this->methods)->mapWithKeys(fn($method) => [$method => false])->toArray();
 
@@ -65,7 +87,7 @@ class UsesFunctions implements Assertable
     protected function failureMessage(string $negated): string
     {
         return $this->failures
-            ->unique(fn(FileUsesFunction $fileUsesFunction) => $fileUsesFunction->filePath.$fileUsesFunction->functionName)
+            ->unique(fn(FileUsesFunction $fileUsesFunction) => $fileUsesFunction->filePath . $fileUsesFunction->functionName)
             ->when(
                 $negated,
                 fn(Collection $failures) => $failures

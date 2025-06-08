@@ -6,13 +6,21 @@ use Illuminate\Support\Collection;
 use Jpeters8889\PhpUnitCodeAssertions\Contracts\Assertable;
 use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
 use Jpeters8889\PhpUnitCodeAssertions\Factories\PhpFileParser;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\Use_;
+use PhpParser\Node\UseItem;
 use PhpParser\NodeFinder;
 use PHPUnit\Framework\Assert;
 
-class AreClasses implements Assertable
+class ToExtend implements Assertable
 {
+    public function __construct(protected string $class)
+    {
+        //
+    }
+
     public function assert(PendingFile $file, bool $negate = false, array $except = []): void
     {
         $ast = PhpFileParser::parse($file->contents);
@@ -21,11 +29,14 @@ class AreClasses implements Assertable
 
         collect((new NodeFinder())->findInstanceOf($ast, Class_::class))
             ->reject(fn(Class_ $class) => in_array($namespaceNode->name->toString() . '\\' . $class->name->toString(), $except, true))
+            ->filter(fn(Class_ $class) => collect(is_array($class->extends) ? $class->extends : [$class->extends])
+                ->map(fn(?Name $extendedClass) => $extendedClass?->name)
+                ->contains(class_basename($this->class)))
             ->when(fn(Collection $collection) => ($collection->isNotEmpty() && count($except) > 0) || count($except) === 0, fn(Collection $collection) => $collection
                 ->when(
                     !$negate,
-                    fn(Collection $nodes) => $nodes->whenEmpty(fn() => Assert::fail("{$file->localPath} is not a class")),
-                    fn(Collection $nodes) => $nodes->whenNotEmpty(fn() => Assert::fail("{$file->localPath} is a class")),
+                    fn(Collection $nodes) => $nodes->whenEmpty(fn() => Assert::fail("{$file->localPath} does not extend {$this->class}")),
+                    fn(Collection $nodes) => $nodes->whenNotEmpty(fn() => Assert::fail("{$file->localPath} extends {$this->class}")),
                 )
             );
 
