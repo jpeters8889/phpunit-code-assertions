@@ -2,3 +2,6 @@
 /.idea
 /build
 /.phpunit.cache
+/composer.lock
+phpstan.neon
+phpunit.xml

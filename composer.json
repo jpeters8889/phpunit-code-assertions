@@ -1,6 +1,7 @@
 {
     "name": "jpeters8889/phpunit-code-assertions",
     "type": "library",
+    "version": "0.1.0",
     "require": {
         "php": "^8.3",
         "phpunit/phpunit": "^12.1",

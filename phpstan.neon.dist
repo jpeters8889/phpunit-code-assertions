@@ -1,0 +1,9 @@
+parameters:
+  level: 6
+  paths:
+    - src
+  tmpDir: build/phpstan
+  ignoreErrors:
+    -
+      message: '#Call to static method PHPUnit\\Framework\\Assert::assertTrue\(\) with true will always evaluate to true.#'
+      identifier: staticMethod.alreadyNarrowedType
