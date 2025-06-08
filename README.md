@@ -18,7 +18,7 @@ class CodeQuality extends CodeAssertionsTestCase
     #[Test]
     public function the_code_doesnt_have_any_forbidden_functions()
     {
-        $this->assertCode('app')->doesNotUseFunctions(['dd', 'dump']);
+        $this->assertCodeIn('app')->doesNotUseFunctions(['dd', 'dump']);
     }
     
     #[Test]

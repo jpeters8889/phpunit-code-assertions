@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class CodeAssertionsTestCase extends TestCase
 {
-    public function assertCode(string $path = './app'): CodeAssertableBuilder
+    public function assertCodeIn(string $path = './app'): CodeAssertableBuilder
     {
         return new CodeAssertableBuilder($path);
     }

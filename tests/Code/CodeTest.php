@@ -14,7 +14,7 @@ class CodeTest extends CodeAssertionsTestCase
     #[Test]
     public function allFilesDeclareStrictTypes(): void
     {
-        $this->assertCode('src')->usesStrictTypes();
+        $this->assertCodeIn('src')->usesStrictTypes();
     }
 
     #[Test]
