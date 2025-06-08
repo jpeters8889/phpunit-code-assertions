@@ -31,7 +31,7 @@ use Throwable;
  * @method self uses(string $trait)
  * @method self extends(string $class)
  * @method self isAbstract()
- * @method self hasMethods(array $methods)
+ * @method self hasMethods(string[] $methods)
  * @method self toHaveMethod(string $method)
  * @method self hasMethod(string $method)
  * @method self toNotHaveMethod(string $method)

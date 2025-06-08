@@ -31,6 +31,7 @@ abstract class AssertableBuilder
 
     protected string $localPath;
 
+    /** @var array<string, string> | array<string, array{string, callable}> */
     protected array $aliases;
 
     public function __construct(string $pathOrNamespace)
@@ -139,19 +140,23 @@ abstract class AssertableBuilder
     }
 
     /**
-     * @return array<string, string> | array<string, array<string, callable>>
+     * @return array<string, string> | array<string, array{string, callable}>
      */
     public function methodAliases(): array
     {
         return [];
     }
 
-    public function __call(string $method, array $args)
+    /**
+     * @param array<mixed> $args
+     */
+    public function __call(string $method, array $args): static
     {
         if ( ! array_key_exists($method, $this->aliases)) {
             throw new Error('Call to undefined method ' . get_class($this) . '::' . $method);
         }
 
+        /** @var string | array{string, callable} $newMethod */
         $newMethod = $this->aliases[$method];
 
         if (is_array($newMethod)) {
