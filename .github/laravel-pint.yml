@@ -1,0 +1,43 @@
+name: Laravel Pint
+on:
+  -
+    pull_request:
+      types:
+        - opened
+        - reopened
+        - synchronize
+        - ready_for_review
+  -
+    push:
+      branches:
+        - main
+
+defaults:
+  run:
+    working-directory: ./
+
+jobs:
+  pint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+
+        with:
+          php-version: '8.3'
+
+      - uses: actions/cache@v3
+        id: composer-cache
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install Composer
+        if: steps.composer.outputs.cache-hit != 'true'
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Laravel Pint
+        run: composer run pint
+
