@@ -12,6 +12,12 @@ use PHPUnit\Framework\Attributes\Test;
 class CodeTest extends CodeAssertionsTestCase
 {
     #[Test]
+    public function allFilesDeclareStrictTypes(): void
+    {
+        $this->assertCode('src')->usesStrictTypes();
+    }
+
+    #[Test]
     public function allAssertionClassesImplementTheAssertableInterface(): void
     {
         $this->assertClassesIn('src/Assertions')->implement(Assertable::class);

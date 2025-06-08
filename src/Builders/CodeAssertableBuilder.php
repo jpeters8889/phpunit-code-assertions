@@ -7,6 +7,10 @@ namespace Jpeters8889\PhpUnitCodeAssertions\Builders;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasStrictTypes;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\UsesFunctions;
 
+/**
+ * @method self hasStrictTypes()
+ * @method self usesStrictTypes()
+ */
 class CodeAssertableBuilder extends AssertableBuilder
 {
     /** @param string[] $functions */
@@ -29,5 +33,13 @@ class CodeAssertableBuilder extends AssertableBuilder
     public function toNotUseStrictTypes(): static
     {
         return $this->addAssertion(HasStrictTypes::class, negate: true);
+    }
+
+    public function methodAliases(): array
+    {
+        return [
+            'hasStrictTypes' => 'toUseStrictTypes',
+            'usesStrictTypes' => 'toUseStrictTypes',
+        ];
     }
 }

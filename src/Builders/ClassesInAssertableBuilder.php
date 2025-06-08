@@ -30,6 +30,7 @@ use Throwable;
  * @method self areNotContracts()
  * @method self uses(string $trait)
  * @method self extends(string $class)
+ * @method self extend(string $class)
  * @method self isAbstract()
  * @method self hasMethods(string[] $methods)
  * @method self toHaveMethod(string $method)
@@ -175,6 +176,7 @@ class ClassesInAssertableBuilder extends CodeAssertableBuilder
             'areContracts' => 'areInterfaces',
             'areNotContracts' => 'areNotInterfaces',
             'uses' => 'toUse',
+            'extend' => 'toExtend',
             'extends' => 'toExtend',
             'isAbstract' => 'toBeAbstract',
             'hasMethods' => 'toHaveMethods',
@@ -184,11 +186,15 @@ class ClassesInAssertableBuilder extends CodeAssertableBuilder
             'toBeInvokable' => ['toHaveMethods', static fn () => [[['__invoke']]]],
             'toNotBeInvokable' => ['toNotHaveMethods', static fn () => [[['__invoke']]]],
             'isInvokable' => ['toHaveMethods', static fn () => [[['__invoke']]]],
+            'areInvokable' => ['toHaveMethods', static fn () => [[['__invoke']]]],
+            'areOnlyInvokable' => ['toOnlyHaveMethod', static fn () => ['__invoke']],
             'toBeOnlyInvokable' => ['toOnlyHaveMethod', static fn () => ['__invoke']],
             'toNotOnlyBeInvokable' => ['toNotOnlyHaveMethod', static fn () => ['__invoke']],
             'isFinal' => 'toBeFinal',
+            'areFinal' => 'toBeFinal',
             'areReadOnly' => 'toBeReadOnly',
             'hasSuffix' => 'toHaveSuffix',
+            'haveSuffix' => 'toHaveSuffix',
         ];
     }
 
