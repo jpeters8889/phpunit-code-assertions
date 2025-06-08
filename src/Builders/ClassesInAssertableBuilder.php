@@ -23,6 +23,27 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
+/**
+ * @method self implement(string $interface)
+ * @method self implements(string $interface)
+ * @method self areContracts()
+ * @method self areNotContracts()
+ * @method self uses(string $trait)
+ * @method self extends(string $class)
+ * @method self isAbstract()
+ * @method self hasMethods(array $methods)
+ * @method self toHaveMethod(string $method)
+ * @method self hasMethod(string $method)
+ * @method self toNotHaveMethod(string $method)
+ * @method self toBeInvokable()
+ * @method self toNotBeInvokable()
+ * @method self isInvokable()
+ * @method self toBeOnlyInvokable()
+ * @method self toNotOnlyBeInvokable()
+ * @method self isFinal()
+ * @method self areReadOnly()
+ * @method self hasSuffix(string $suffix)
+ */
 class ClassesInAssertableBuilder extends CodeAssertableBuilder
 {
     public function areTraits(): static
@@ -53,16 +74,6 @@ class ClassesInAssertableBuilder extends CodeAssertableBuilder
     public function areNotInterfaces(): static
     {
         return $this->addAssertion(AreInterfaces::class, negate: true);
-    }
-
-    public function areContracts(): static
-    {
-        return $this->areInterfaces();
-    }
-
-    public function areNotContracts(): static
-    {
-        return $this->areNotInterfaces();
     }
 
     public function toImplement(string $interface): static
@@ -116,26 +127,6 @@ class ClassesInAssertableBuilder extends CodeAssertableBuilder
         return $this->addAssertion(HasMethods::class, negate: true, args: $methods);
     }
 
-    public function toHaveMethod(string $method): static
-    {
-        return $this->toHaveMethods([$method]);
-    }
-
-    public function toNotHaveMethod(string $method): static
-    {
-        return $this->toNotHaveMethods([$method]);
-    }
-
-    public function toBeInvokable(): static
-    {
-        return $this->toHaveMethod('__invoke');
-    }
-
-    public function toBeNotInvokable(): static
-    {
-        return $this->toNotHaveMethod('__invoke');
-    }
-
     public function toOnlyHaveMethod(string $method): static
     {
         return $this->addAssertion(OnlyHaveMethod::class, args: [$method]);
@@ -144,16 +135,6 @@ class ClassesInAssertableBuilder extends CodeAssertableBuilder
     public function toNotOnlyHaveMethod(string $method): static
     {
         return $this->addAssertion(OnlyHaveMethod::class, negate: true, args: [$method]);
-    }
-
-    public function toOnlyBeInvokable(): static
-    {
-        return $this->toOnlyHaveMethod('__invoke');
-    }
-
-    public function toNotOnlyBeInvokable(): static
-    {
-        return $this->toNotOnlyHaveMethod('__invoke');
     }
 
     public function toBeFinal(): static
@@ -184,6 +165,31 @@ class ClassesInAssertableBuilder extends CodeAssertableBuilder
     public function toNotHaveSuffix(string $suffix): static
     {
         return $this->addAssertion(HasSuffix::class, negate: true, args: [$suffix]);
+    }
+
+    public function methodAliases(): array
+    {
+        return [
+            'implement' => 'toImplement',
+            'implements' => 'toImplement',
+            'areContracts' => 'areInterfaces',
+            'areNotContracts' => 'areNotInterfaces',
+            'uses' => 'toUse',
+            'extends' => 'toExtend',
+            'isAbstract' => 'toBeAbstract',
+            'hasMethods' => 'toHaveMethods',
+            'toHaveMethod' => ['toHaveMethods', static fn(string $method) => [[[$method]]]],
+            'hasMethod' => ['toHaveMethods', static fn(string $method) => [[[$method]]]],
+            'toNotHaveMethod' => ['toNotHaveMethod', static fn(string $method) => [[[$method]]]],
+            'toBeInvokable' => ['toHaveMethods', static fn() => ['__invoke']],
+            'toNotBeInvokable' => ['toNotHaveMethods', static fn() => ['__invoke']],
+            'isInvokable' => 'toBeInvokable',
+            'toBeOnlyInvokable' => ['toOnlyHaveMethod', static fn() => '__invoke'],
+            'toNotOnlyBeInvokable' => ['toNotOnlyHaveMethod', static fn() => '__invoke'],
+            'isFinal' => 'toBeFinal',
+            'areReadOnly' => 'toBeReadOnly',
+            'hasSuffix' => 'toHaveSuffix',
+        ];
     }
 
     protected function isFileTestable(SplFileInfo $file): bool

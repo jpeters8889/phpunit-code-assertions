@@ -30,11 +30,14 @@ abstract class AssertableBuilder
 
     protected string $localPath;
 
+    protected array $aliases;
+
     public function __construct(string $pathOrNamespace)
     {
         $this->normalisePath($pathOrNamespace);
 
         $this->assertionsToMake = collect();
+        $this->aliases = $this->methodAliases();
     }
 
     protected function normalisePath(string $pathOrNamespace): void
@@ -132,6 +135,30 @@ abstract class AssertableBuilder
     public function getAssertionsToMake(): Collection
     {
         return $this->assertionsToMake;
+    }
+
+    /**
+     * @return array<string, string> | array<string, array<string, callable>>
+     */
+    public function methodAliases(): array
+    {
+        return [];
+    }
+
+    public function __call(string $method, array $args)
+    {
+        if (!array_key_exists($method, $this->aliases)) {
+            throw new \Error('Call to undefined method ' . get_class($this) . '::' . $method);
+        }
+
+        $newMethod = $this->aliases[$method];
+
+        if (is_array($newMethod)) {
+            $args = call_user_func($newMethod[1], ...$args);
+            $newMethod = $newMethod[0];
+        }
+
+        return $this->$newMethod(...$args);
     }
 
     public function executeAssertions(): void

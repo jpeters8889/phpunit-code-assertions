@@ -14,15 +14,15 @@ class CodeTest extends CodeAssertionsTestCase
     #[Test]
     public function allAssertionClassesImplementTheAssertableInterface(): void
     {
-        $this->assertClassesIn('src/Assertions')->toImplement(Assertable::class);
+        $this->assertClassesIn('src/Assertions')->implement(Assertable::class);
     }
 
     #[Test]
     public function allClassesInTheBuilderDirectory(): void
     {
         $this->assertClassesIn('src/Builders')
-            ->toExtend(AssertableBuilder::class)->except(AssertableBuilder::class)
-            ->toHaveSuffix('AssertableBuilder');
+            ->extends(AssertableBuilder::class)->except(AssertableBuilder::class)
+            ->hasSuffix('AssertableBuilder');
     }
 
     #[Test]
@@ -40,6 +40,6 @@ class CodeTest extends CodeAssertionsTestCase
     #[Test]
     public function allClassesInDtoDirectoryAreReadOnly(): void
     {
-        $this->assertClassesIn('src/Dto')->toBeReadOnly();
+        $this->assertClassesIn('src/Dto')->areReadOnly();
     }
 }
