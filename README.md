@@ -8,7 +8,7 @@
 
 **PHPUnit Code Assertions** is a set of code assertions to use in a PHPUnit test suite, heavily inspired by PestPHP Arch testing, but in a PHPUnit code style.
 
-Simple extend the `CodeAssertionsTestCase` in your test file and you're ready to go!
+Simply extend the `CodeAssertionsTestCase` in your test file and you're ready to go!
 
 ```php
 <?php
@@ -45,9 +45,9 @@ composer require jpeters8889/phpunit-code-assertions:^0.1
 
 ## Usage
 
-`CodeAssertionsTestCase` exposes two methods to chain your tests onto, `assertCode` and `assertClassesIn`
+`CodeAssertionsTestCase` exposes two methods to chain your tests onto, `assertCodeIn` and `assertClassesIn`
 
-### assertCode
+### assertCodeIn
 
 This method will run any of the chained assertables against all code in the given directory.
 
@@ -71,35 +71,85 @@ At the end of your assertable chain, all of the assertions will be executed agai
 
 This method will run any of the chained assertables against all classes/traits/interfaces etc in the given directory
 
-This method also inherits all of the assertables in the `assertCode` above.
+This method also supports all assertables available in `assertCodeIn`, in addition to class-specific assertions.
 
-`areTraits()` - Asserts that all files in the given directory are traits.
+#### Available Methods
 
-`areNotTraits()` - Asserts that files in the given directory are not traits.
+##### Interfaces
 
-`areClasses()` - Asserts that all files in the given directory are classes.
+`areContracts()` - Alias for areInterfaces()
 
-`areNotClasses()` - Asserts that files in the given directory are not classes.
+`areNotContracts()` - Alias for areNotInterfaces()
 
 `areInterfaces()` - Asserts that all files in the given directory are interfaces.
 
 `areNotInterfaces()` - Asserts that files in the given directory are not interfaces.
 
+`implement(string $interface)` - Alias for toImplement()
+
+`implements(string $interface)` - Alias for toImplement()
+
 `toImplement(string $interface)` - Asserts that all files in the given directory implement the given interface.
 
 `toNotImplement(string $interface)` - Asserts that files in the given directory do not implement the given interface.
+
+##### Traits
+
+`areTraits()` - Asserts that all files in the given directory are traits.
+
+`areNotTraits()` - Asserts that files in the given directory are not traits.
 
 `toUse(string $trait)` - Asserts that all files in the given directory use the given trait.
 
 `toNotUse(string $trait)` - Asserts that files in the given directory do not use the given trait.
 
+`uses(string $trait)` - Alias for toUse()
+
+##### Classes
+
+`areClasses()` - Asserts that all files in the given directory are classes.
+
+`areNotClasses()` - Asserts that files in the given directory are not classes.
+
+###### Extending
+
 `toExtend(string $class)` - Asserts that all files in the given directory extend the given class.
 
 `toNotExtend(string $class)` - Asserts that files in the given directory do not extend the given class.
 
+`extend(string $class)` - Alias for toExtend()
+
+`extends(string $class)` - Alias for toExtend()
+
+###### Abstract
+
 `toBeAbstract()` - Asserts that all files in the given directory are abstract classes.
 
 `toNotBeAbstract()` - Asserts that files in the given directory are not abstract classes.
+
+`isAbstract()` - Alias for toBeAbstract()
+
+###### Final
+
+`toBeFinal()` - Asserts that all files in the given directory are final classes.
+
+`toNotBeFinal()` - Asserts that files in the given directory are not final classes.
+
+`isFinal()` - Alias for toBeFinal()
+
+`areFinal()` - Alias for toBeFinal()
+
+###### Read Only
+
+`toBeReadOnly()` - Asserts that all files in the given directory are read only.
+
+`toNotBeReadOnly()` - Asserts that files in the given directory are not read only.
+
+`areReadOnly()` - Alias for toBeReadOnly()
+
+##### Generic
+
+###### Methods
 
 `toHaveMethods(array $methods)` - Asserts that all files in the given directory have the given methods.
 
@@ -109,34 +159,6 @@ This method also inherits all of the assertables in the `assertCode` above.
 
 `toNotOnlyHaveMethod()` - Asserts that files in the given directory does not only have the given method.
 
-`toBeFinal()` - Asserts that all files in the given directory are final classes.
-
-`toNotBeFinal()` - Asserts that files in the given directory are not final classes.
-
-`toBeReadOnly()` - Asserts that all files in the given directory are read only.
-
-`toNotBeReadOnly()` - Asserts that files in the given directory are not read only.
-
-`toHaveSuffix(string $suffix)` - Asserts that all files in the given directory are have the given suffix.
-
-`toNotHaveSuffix(string $suffix)` - Asserts that files in the given directory do not have the given suffix.
-
-`implement(string $interface)` - Alias for toImplement()
-
-`implements(string $interface)` - Alias for toImplement()
-
-`areContracts()` - Alias for areInterfaces()
-
-`areNotContracts()` - Alias for areNitInterfaces()
-
-`uses(string $trait)` - Alias for toUse()
-
-`extend(string $class)` - Alias for toExtend()
-
-`extends(string $class)` - Alias for toExtend()
-
-`isAbstract()` - Alias for toBeAbstract()
-
 `hasMethods(array $methods)` - Alias for toHaveMethods()
 
 `toHaveMethod(string $method)` - Wrapper for toHaveMethods but with one method.
@@ -144,6 +166,8 @@ This method also inherits all of the assertables in the `assertCode` above.
 `hasMethod(string $method)` - Wrapper for toHaveMethods but with one method.
 
 `toNotHaveMethod(string $method)` - Wrapper for toNotHaveMethods but with one method.
+
+###### Invokable
 
 `toBeInokable()` - Wrapper for toHaveMethods but passing \['__invoke'\].
 
@@ -157,11 +181,11 @@ This method also inherits all of the assertables in the `assertCode` above.
 
 `toNotBeOnlyInvokable()` - Wrapper for toNotOnlyHaveMethod but passing \['__invoke'\].
 
-`isFinal()` - Alias for toBeFinal()
+###### Suffix
 
-`areFinal()` - Alias for toBeFinal()
+`toHaveSuffix(string $suffix)` - Asserts that all files in the given directory are have the given suffix.
 
-`areReadOnly()` - Alias for toBeReadOnly()
+`toNotHaveSuffix(string $suffix)` - Asserts that files in the given directory do not have the given suffix.
 
 `hasSuffix()` - Alias for toHaveSuffix()
 
@@ -180,7 +204,7 @@ class CodeQuality extends CodeAssertionsTestCase
     public function all_controllers_follow_the_same_pattern()
     {
         $this->assertClassesIn('app/Http/Controllers')
-            ->extend(App\Http\Controllers\BaseController::class)->except(App\Http\Controllers\BaseController::clas)
+            ->extend(App\Http\Controllers\BaseController::class)->except(App\Http\Controllers\BaseController::class)
     }
 }
 ```
