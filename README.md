@@ -47,11 +47,15 @@ composer require jpeters8889/phpunit-code-assertions:^0.1
 
 `CodeAssertionsTestCase` exposes two methods to chain your tests onto, `assertCodeIn` and `assertClassesIn`
 
+Both `assertCodeIn` and `assertClassesIn` support a variety of fluent assertions and common aliases for readability, such as `implements()` instead of `toImplement()` for improved readability, you can use either the canonical form or the alias — they behave identically.
+
 ### assertCodeIn
 
 This method will run any of the chained assertables against all code in the given directory.
 
-At the end of your assertable chain, all of the assertions will be executed against all found files in the given directory, alternately, you can also call `executeAssertions()` to manually trigger the assertions.
+At the end of your assertable chain, all of the assertions will be executed against all found files in the given directory. 
+
+Alternately, you can also call `executeAssertions()` to manually trigger the assertions.
 
 #### Available Methods
 
@@ -183,7 +187,7 @@ This method also supports all assertables available in `assertCodeIn`, in additi
 
 ###### Suffix
 
-`toHaveSuffix(string $suffix)` - Asserts that all files in the given directory are have the given suffix.
+`toHaveSuffix(string $suffix)` - Asserts that all files in the given directory have the given suffix.
 
 `toNotHaveSuffix(string $suffix)` - Asserts that files in the given directory do not have the given suffix.
 
