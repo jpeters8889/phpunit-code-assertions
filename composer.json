@@ -38,7 +38,7 @@
             "vendor/bin/phpstan analyse --memory-limit 4048M"
         ],
         "pint": "vendor/bin/pint -vvv",
-        "test": "php artisan test --parallel",
+        "test": "vendor/bin/phpunit",
         "pre-commit": [
             "Composer\\Config::disableProcessTimeout",
             "composer run pint",

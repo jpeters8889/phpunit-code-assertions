@@ -17,7 +17,6 @@ use Jpeters8889\PhpUnitCodeAssertions\Assertions\ToExtend;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\ToImplement;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\ToUse;
 use Jpeters8889\PhpUnitCodeAssertions\Factories\PhpFileParser;
-use PhpParser\Node\Expr\Error;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\NodeFinder;
 use PHPUnit\Framework\Assert;
