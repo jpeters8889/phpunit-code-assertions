@@ -15,6 +15,7 @@ use Jpeters8889\PhpUnitCodeAssertions\Dto\PendingFile;
 use Jpeters8889\PhpUnitCodeAssertions\Factories\AssertableFactory;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Finder\SplFileInfo;
+use Error;
 
 abstract class AssertableBuilder
 {
@@ -147,8 +148,8 @@ abstract class AssertableBuilder
 
     public function __call(string $method, array $args)
     {
-        if (!array_key_exists($method, $this->aliases)) {
-            throw new \Error('Call to undefined method ' . get_class($this) . '::' . $method);
+        if ( ! array_key_exists($method, $this->aliases)) {
+            throw new Error('Call to undefined method ' . get_class($this) . '::' . $method);
         }
 
         $newMethod = $this->aliases[$method];

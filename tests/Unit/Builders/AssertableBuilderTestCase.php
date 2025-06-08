@@ -176,11 +176,11 @@ abstract class AssertableBuilderTestCase extends TestCase
 
         $classAliases = $invadedBuilder->methodAliases();
 
-        if(empty($classAliases)) {
-            $this->markTestSkipped($builder::class.' has no aliased methods');
+        if (empty($classAliases)) {
+            $this->markTestSkipped($builder::class . ' has no aliased methods');
         }
 
-        foreach($classAliases as $alias => $method) {
+        foreach ($classAliases as $alias => $method) {
             $callable = null;
             $args = null;
 
@@ -191,19 +191,19 @@ abstract class AssertableBuilderTestCase extends TestCase
                 $argsTransformer = new ReflectionFunction($callable);
                 $params = $argsTransformer->getParameters();
 
-                $args = array_map(fn(ReflectionParameter $param) => match($param->getType()->getName()) {
+                $args = array_map(fn (ReflectionParameter $param) => match($param->getType()->getName()) {
                     'array' => ['foo'],
                     default => 'foo',
                 }, $params);
             }
 
             // If we dont have any args, then figure out what the method wants
-            if(!$args) {
+            if ( ! $args) {
                 $reflectedBuilder = new ReflectionClass($builder);
                 $parentMethod = $reflectedBuilder->getMethod($method);
                 $params = $parentMethod->getParameters();
 
-                $args = array_map(fn(ReflectionParameter $param) => match($param->getType()->getName()) {
+                $args = array_map(fn (ReflectionParameter $param) => match($param->getType()->getName()) {
                     'array' => ['foo'],
                     default => 'foo',
                 }, $params);
@@ -214,10 +214,10 @@ abstract class AssertableBuilderTestCase extends TestCase
             $mockedBuilder
                 ->shouldReceive($method)
                 ->once()
-                ->withArgs(function(...$params) use($expectedArgs) {
+                ->withArgs(function (...$params) use ($expectedArgs) {
                     $this->assertCount(count($params), $expectedArgs);
 
-                    foreach($params as $index => $param) {
+                    foreach ($params as $index => $param) {
                         $this->assertEquals($expectedArgs[$index], $param);
                     }
 
@@ -225,7 +225,7 @@ abstract class AssertableBuilderTestCase extends TestCase
                 })
                 ->getMock()
                 ->shouldReceive($alias)
-                ->withArgs(function(...$params) use ($args) {
+                ->withArgs(function (...$params) use ($args) {
                     foreach ($params as $index => $param) {
                         $this->assertEquals($args[$index], $param);
                     }
