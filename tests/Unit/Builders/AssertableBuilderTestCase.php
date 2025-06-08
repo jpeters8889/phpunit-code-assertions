@@ -16,6 +16,9 @@ use Jpeters8889\PhpUnitCodeAssertions\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionClass;
+use ReflectionFunction;
+use ReflectionParameter;
 
 abstract class AssertableBuilderTestCase extends TestCase
 {
@@ -161,6 +164,79 @@ abstract class AssertableBuilderTestCase extends TestCase
 
         $invadedBuilder = invade($builder);
         $invadedBuilder->assertionsToMake = collect();
+    }
+
+    #[Test]
+    public function itCanCallAssertablesViaAMethodAliasCall(): void
+    {
+        $builder = $this->makeBuilder('tests/Fixtures');
+        $invadedBuilder = invade($builder);
+
+        $mockedBuilder = Mockery::mock($builder::class);
+
+        $classAliases = $invadedBuilder->methodAliases();
+
+        if(empty($classAliases)) {
+            $this->markTestSkipped($builder::class.' has no aliased methods');
+        }
+
+        foreach($classAliases as $alias => $method) {
+            $callable = null;
+            $args = null;
+
+            if (is_array($method)) {
+                [$method, $callable] = $method;
+
+                // get the result of the arg transformer
+                $argsTransformer = new ReflectionFunction($callable);
+                $params = $argsTransformer->getParameters();
+
+                $args = array_map(fn(ReflectionParameter $param) => match($param->getType()->getName()) {
+                    'array' => ['foo'],
+                    default => 'foo',
+                }, $params);
+            }
+
+            // If we dont have any args, then figure out what the method wants
+            if(!$args) {
+                $reflectedBuilder = new ReflectionClass($builder);
+                $parentMethod = $reflectedBuilder->getMethod($method);
+                $params = $parentMethod->getParameters();
+
+                $args = array_map(fn(ReflectionParameter $param) => match($param->getType()->getName()) {
+                    'array' => ['foo'],
+                    default => 'foo',
+                }, $params);
+            }
+
+            $expectedArgs = $callable ? $callable(...$args) : $args;
+
+            $mockedBuilder
+                ->shouldReceive($method)
+                ->once()
+                ->withArgs(function(...$params) use($expectedArgs) {
+                    $this->assertCount(count($params), $expectedArgs);
+
+                    foreach($params as $index => $param) {
+                        $this->assertEquals($expectedArgs[$index], $param);
+                    }
+
+                    return true;
+                })
+                ->getMock()
+                ->shouldReceive($alias)
+                ->withArgs(function(...$params) use ($args) {
+                    foreach ($params as $index => $param) {
+                        $this->assertEquals($args[$index], $param);
+                    }
+
+                    return true;
+                })
+                ->once()
+                ->andReturn($mockedBuilder->$method(...$expectedArgs));
+
+            $mockedBuilder->{$alias}(...$args);
+        }
     }
 
     public static function assertablesToQueue(): array
