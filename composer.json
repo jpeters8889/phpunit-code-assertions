@@ -12,7 +12,6 @@
         "assertions"
     ],
     "type": "library",
-    "version": "0.1.0",
     "require": {
         "php": "^8.3",
         "phpunit/phpunit": "^11.0|^12.0",
