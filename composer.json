@@ -45,6 +45,7 @@
             "homepage": "https://www.jamie-peters.co.uk"
         }
     ],
+    "license": "MIT",
     "scripts": {
         "stan": [
             "Composer\\Config::disableProcessTimeout",
