@@ -1,14 +1,25 @@
 {
     "name": "jpeters8889/phpunit-code-assertions",
+    "description": "Rules and assertions in PHPUnit for code quality, rules and patterns.",
+    "keywords": [
+        "php",
+        "framework",
+        "unit",
+        "test",
+        "testing",
+        "architecture",
+        "code",
+        "assertions"
+    ],
     "type": "library",
     "version": "0.1.0",
     "require": {
         "php": "^8.3",
-        "phpunit/phpunit": "^12.1",
-        "illuminate/collections": "^12.16",
-        "symfony/finder": "^7.3",
-        "illuminate/support": "^12.16",
-        "nikic/php-parser": "^5.5"
+        "phpunit/phpunit": "^11.0|^12.0",
+        "illuminate/collections": "^12.0",
+        "symfony/finder": "^7.0",
+        "illuminate/support": "^12.0",
+        "nikic/php-parser": "^5.0"
     },
     "require-dev": {
         "laravel/pint": "^1.22",
@@ -30,7 +41,8 @@
     "authors": [
         {
             "name": "Jamie Peters",
-            "email": "jamie@jamie-peters.co.uk"
+            "email": "jamie@jamie-peters.co.uk",
+            "homepage": "https://www.jamie-peters.co.uk"
         }
     ],
     "scripts": {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jpeters8889\PhpUnitCodeAssertions\Builders;
 
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreClasses;
+use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreEnums;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreInterfaces;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreTraits;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasMethods;
@@ -41,6 +42,8 @@ use Throwable;
  * @method self isInvokable()
  * @method self toBeOnlyInvokable()
  * @method self toNotOnlyBeInvokable()
+ * @method self areInvokable()
+ * @method self areOnlyInvokable()
  * @method self isFinal()
  * @method self areReadOnly()
  * @method self hasSuffix(string $suffix)
@@ -75,6 +78,16 @@ class ClassesInAssertableBuilder extends CodeAssertableBuilder
     public function areNotInterfaces(): static
     {
         return $this->addAssertion(AreInterfaces::class, negate: true);
+    }
+
+    public function areEnums(): static
+    {
+        return $this->addAssertion(AreEnums::class);
+    }
+
+    public function areNotEnums(): static
+    {
+        return $this->addAssertion(AreEnums::class, negate: true);
     }
 
     public function toImplement(string $interface): static

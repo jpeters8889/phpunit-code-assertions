@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jpeters8889\PhpUnitCodeAssertions\Tests\Unit\Builders;
 
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreClasses;
+use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreEnums;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreInterfaces;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\AreTraits;
 use Jpeters8889\PhpUnitCodeAssertions\Assertions\HasMethods;
@@ -87,6 +88,19 @@ class ClassesInAssertableBuilderTest extends AssertableBuilderTestCase
                 testName: 'are not interfaces assertable',
                 assertable: AreInterfaces::class,
                 method: 'areNotInterfaces',
+                negate: true,
+                builderParam: 'tests/Fixtures/Traits',
+            ),
+            new AssertablesToTestDto(
+                testName: 'are enums assertable',
+                assertable: AreEnums::class,
+                method: 'areEnums',
+                builderParam: 'tests/Fixtures/Enums',
+            ),
+            new AssertablesToTestDto(
+                testName: 'are not enums assertable',
+                assertable: AreEnums::class,
+                method: 'areNotEnums',
                 negate: true,
                 builderParam: 'tests/Fixtures/Traits',
             ),

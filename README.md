@@ -37,10 +37,10 @@ class CodeQuality extends CodeAssertionsTestCase
 
 > **Requires [PHP 8.3+](https://php.net/releases/)**.
 
-⚡️ Get started by requiring the package using [Composer](https://getcomposer.org):
+Get started by requiring the package using [Composer](https://getcomposer.org):
 
 ```bash
-composer require jpeters8889/phpunit-code-assertions:^0.1
+composer require jpeters8889/phpunit-code-assertions:^0.1 --dev
 ```
 
 ## Usage
@@ -150,6 +150,12 @@ This method also supports all assertables available in `assertCodeIn`, in additi
 `toNotBeReadOnly()` - Asserts that files in the given directory are not read only.
 
 `areReadOnly()` - Alias for toBeReadOnly()
+
+###### Enums
+
+`areEnums()` - Asserts that all files in the given directory are enums.
+
+`areNotEnums()` - Asserts that files in the given directory are not enums.
 
 ##### Generic
 
