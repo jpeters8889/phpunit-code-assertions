@@ -6,6 +6,8 @@
     <a href="https://github.com/jpeters8889/phpunit-code-assertions/actions"><img src="https://github.com/jpeters8889/phpunit-code-assertions/actions/workflows/phpunit.yml/badge.svg" alt="Build Status"></a>
 </p>
 
+> **Caution**: This package is a **work in progress** and is still at beta stage and could make breaking changes without warning.
+
 **PHPUnit Code Assertions** is a set of code assertions to use in a PHPUnit test suite, heavily inspired by PestPHP Arch testing, but in a PHPUnit code style.
 
 Simply extend the `CodeAssertionsTestCase` in your test file and you're ready to go!
